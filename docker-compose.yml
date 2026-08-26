@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: farmgate_backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://farmGate_user:farmGate_password@db:5432/farmgate_db?schema=public
+    # Décommentez et ajoutez vos variables d'environnement si besoin
+    # env_file:
+    #   - ./backend/.env
+    restart: always
+
+  frontend:
+    build: ./frontend
+    container_name: farmgate_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always
+
+
+  db:
+    image: postgres:16
+    environment:
+       POSTGRES_USER: farmGate_user
+       POSTGRES_PASSWORD: farmGate_password
+       POSTGRES_DB: farmgate_db
+    ports:
+     - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

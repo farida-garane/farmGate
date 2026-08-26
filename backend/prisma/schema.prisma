@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Market {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @db.VarChar(100)
+  region    String   @db.VarChar(100)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  priceReports PriceReport[]
+
+  @@map("markets")
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  fullName     String   @map("full_name") @db.VarChar(150)
+  phone        String   @unique @db.VarChar(20)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  role         String   @db.VarChar(20)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  priceReports PriceReport[]
+
+  @@map("users")
+}
+
+model Product {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique @db.VarChar(100)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  priceReports PriceReport[]
+  floorPrices  FloorPrice[]
+
+  @@map("products")
+}
+
+model PriceReport {
+  id            String   @id @default(uuid()) @db.Uuid
+  productId     String   @map("product_id") @db.Uuid
+  marketId      String   @map("market_id") @db.Uuid
+  reportedBy    String   @map("reported_by") @db.Uuid
+  priceFcfaKg   Decimal  @map("price_fcfa_kg") @db.Decimal(10, 2)
+  reportedAt    DateTime @default(now()) @map("reported_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  market  Market  @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [reportedBy], references: [id], onDelete: Cascade)
+
+  @@index([productId], name: "idx_price_reports_product_id")
+  @@index([marketId], name: "idx_price_reports_market_id")
+  @@index([reportedAt], name: "idx_price_reports_reported_at")
+  @@map("price_reports")
+}
+
+model FloorPrice {
+  id               String   @id @default(uuid()) @db.Uuid
+  productId        String   @map("product_id") @db.Uuid
+  floorPriceFcfaKg Decimal  @map("floor_price_fcfa_kg") @db.Decimal(10, 2)
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId], name: "idx_floor_prices_product_id")
+  @@map("floor_prices")
+}

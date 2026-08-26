@@ -26,7 +26,7 @@ function Home() {
         <div className="hero__content">
           <span className="hero__badge">Prix officiels · Temps réel</span>
           <h1 className="hero__title">
-            Négociez en<br /><em>connaissance de cause</em>
+            Farm<em>Gate</em>
           </h1>
           <p className="hero__text">
             FarmGate rend accessibles les prix planchers agricoles au Burkina Faso,

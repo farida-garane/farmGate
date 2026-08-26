@@ -1,40 +1,39 @@
-const pool = require('../config/db');
-const userModel = require('../models/user.model');
+const prisma = require('../config/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 async function register({ full_name, phone, password, role }) {
-  const existing = await pool.query(
-    `select id from ${userModel.table} where phone = $1`,
-    [phone]
-  );
+  const existing = await prisma.user.findUnique({ where: { phone } });
 
-  if (existing.rows.length > 0) {
+  if (existing) {
     const error = new Error('Ce numéro de téléphone est déjà utilisé');
     error.statusCode = 409;
     throw error;
   }
 
-  const password_hash = await bcrypt.hash(password, 10);
+  const passwordHash = await bcrypt.hash(password, 10);
 
-  const result = await pool.query(
-    `insert into ${userModel.table} (full_name, phone, password_hash, role)
-     values ($1, $2, $3, $4)
-     returning id, full_name, phone, role, created_at`,
-    [full_name, phone, password_hash, role]
-  );
+  const user = await prisma.user.create({
+    data: {
+      fullName: full_name,
+      phone,
+      passwordHash,
+      role
+    }
+  });
 
-  return result.rows[0];
+  return {
+    id: user.id,
+    full_name: user.fullName,
+    phone: user.phone,
+    role: user.role,
+    created_at: user.createdAt
+  };
 }
 
 async function login({ phone, password }) {
-  const result = await pool.query(
-    `select * from ${userModel.table} where phone = $1`,
-    [phone]
-  );
-
-  const user = result.rows[0];
+  const user = await prisma.user.findUnique({ where: { phone } });
 
   if (!user) {
     const error = new Error('Identifiants invalides');
@@ -42,7 +41,7 @@ async function login({ phone, password }) {
     throw error;
   }
 
-  const passwordMatches = await bcrypt.compare(password, user.password_hash);
+  const passwordMatches = await bcrypt.compare(password, user.passwordHash);
 
   if (!passwordMatches) {
     const error = new Error('Identifiants invalides');
@@ -57,7 +56,7 @@ async function login({ phone, password }) {
   );
 
   return {
-    user: { id: user.id, full_name: user.full_name, phone: user.phone, role: user.role },
+    user: { id: user.id, full_name: user.fullName, phone: user.phone, role: user.role },
     token,
   };
 }

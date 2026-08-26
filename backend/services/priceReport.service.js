@@ -1,51 +1,75 @@
-const pool = require('../config/db');
-const priceReportModel = require('../models/priceReport.model');
+const prisma = require('../config/db');
 
 async function getAllPriceReports() {
-  const result = await pool.query(
-    `select * from ${priceReportModel.table} order by reported_at desc`
-  );
-  return result.rows;
+  const reports = await prisma.priceReport.findMany({
+    orderBy: { reportedAt: 'desc' }
+  });
+  return reports.map(r => ({
+    id: r.id,
+    product_id: r.productId,
+    market_id: r.marketId,
+    reported_by: r.reportedBy,
+    price_fcfa_kg: r.priceFcfaKg,
+    reported_at: r.reportedAt
+  }));
 }
 
 async function getPriceReportById(id) {
-  const result = await pool.query(
-    `select * from ${priceReportModel.table} where id = $1`,
-    [id]
-  );
+  const report = await prisma.priceReport.findUnique({ where: { id } });
 
-  if (result.rows.length === 0) {
+  if (!report) {
     const error = new Error('Signalement introuvable');
     error.statusCode = 404;
     throw error;
   }
 
-  return result.rows[0];
+  return {
+    id: report.id,
+    product_id: report.productId,
+    market_id: report.marketId,
+    reported_by: report.reportedBy,
+    price_fcfa_kg: report.priceFcfaKg,
+    reported_at: report.reportedAt
+  };
 }
 
 async function createPriceReport({ product_id, market_id, reported_by, price_fcfa_kg }) {
-  const result = await pool.query(
-    `insert into ${priceReportModel.table} (product_id, market_id, reported_by, price_fcfa_kg)
-     values ($1, $2, $3, $4)
-     returning *`,
-    [product_id, market_id, reported_by, price_fcfa_kg]
-  );
-  return result.rows[0];
+  const report = await prisma.priceReport.create({
+    data: {
+      productId: product_id,
+      marketId: market_id,
+      reportedBy: reported_by, // Attention: il faut s'assurer que le controller l'envoie !
+      priceFcfaKg: price_fcfa_kg
+    }
+  });
+  
+  return {
+    id: report.id,
+    product_id: report.productId,
+    market_id: report.marketId,
+    reported_by: report.reportedBy,
+    price_fcfa_kg: report.priceFcfaKg,
+    reported_at: report.reportedAt
+  };
 }
 
 async function deletePriceReport(id) {
-  const result = await pool.query(
-    `delete from ${priceReportModel.table} where id = $1 returning *`,
-    [id]
-  );
+  const report = await prisma.priceReport.delete({ where: { id } }).catch(() => null);
 
-  if (result.rows.length === 0) {
+  if (!report) {
     const error = new Error('Signalement introuvable');
     error.statusCode = 404;
     throw error;
   }
 
-  return result.rows[0];
+  return {
+    id: report.id,
+    product_id: report.productId,
+    market_id: report.marketId,
+    reported_by: report.reportedBy,
+    price_fcfa_kg: report.priceFcfaKg,
+    reported_at: report.reportedAt
+  };
 }
 
 module.exports = {

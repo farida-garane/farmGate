@@ -22,7 +22,7 @@ async function create(req, res, next) {
     const newReport = await priceReportService.createPriceReport({
       product_id,
       market_id,
-      reported_by: req.user ? req.user.id : req.body.reported_by, // Récupère l'ID de l'utilisateur connecté ou du body
+      reported_by: req.user.id,
       price_fcfa_kg,
     });
 

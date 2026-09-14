@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-async function register({ full_name, phone, password, role }) {
+async function register({ full_name, phone, password, role = 'FARMER', region = null }) {
   const existing = await prisma.user.findUnique({ where: { phone } });
 
   if (existing) {
@@ -13,22 +13,25 @@ async function register({ full_name, phone, password, role }) {
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
+  const normalizedRole = role.toUpperCase();
 
   const user = await prisma.user.create({
     data: {
       fullName: full_name,
       phone,
       passwordHash,
-      role
+      role: normalizedRole,
+      region
     }
   });
 
   return {
     id: user.id,
+    fullName: user.fullName,
     full_name: user.fullName,
     phone: user.phone,
     role: user.role,
-    created_at: user.createdAt
+    region: user.region,
   };
 }
 
@@ -56,7 +59,13 @@ async function login({ phone, password }) {
   );
 
   return {
-    user: { id: user.id, full_name: user.fullName, phone: user.phone, role: user.role },
+    user: {
+      id: user.id,
+      fullName: user.fullName,
+      full_name: user.fullName,
+      phone: user.phone,
+      role: user.role,
+    },
     token,
   };
 }

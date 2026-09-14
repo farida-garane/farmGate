@@ -23,4 +23,28 @@ function authMiddleware(req, res, next) {
   }
 }
 
+function authorizeRoles(...allowedRoles) {
+  return (req, res, next) => {
+    if (!req.user) {
+      const error = new Error('Authentification requise');
+      error.statusCode = 401;
+      return next(error);
+    }
+
+    const userRole = (req.user.role || '').toUpperCase();
+    const normalizedAllowed = allowedRoles.map((r) => r.toUpperCase());
+
+    if (!normalizedAllowed.includes(userRole)) {
+      const error = new Error('Accès refusé : privilèges insuffisants');
+      error.statusCode = 403;
+      return next(error);
+    }
+
+    next();
+  };
+}
+
+authMiddleware.authMiddleware = authMiddleware;
+authMiddleware.authorizeRoles = authorizeRoles;
+
 module.exports = authMiddleware;

@@ -1,26 +1,70 @@
 services:
-  backend:
-    build: ./backend
-    container_name: farmgate_backend
-    ports:
-      - "5000:5000"
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://farmGate_user:farmGate_password@db:5432/farmgate_db?schema=public
-    depends_on:
-      - db
-    restart: always
-
+  # ─────────────────────────────────────────────
+  # Service 1 : la base de données PostgreSQL
+  # ─────────────────────────────────────────────
   db:
-    image: postgres:16
+    # Image officielle de PostgreSQL (version 16, allégée avec Alpine)
+    image: postgres:16-alpine
+
+    # Variables qui créent la base et l'utilisateur au premier démarrage
+    # (les valeurs viennent du fichier .env)
     environment:
-      POSTGRES_USER: farmGate_user
-      POSTGRES_PASSWORD: farmGate_password
-      POSTGRES_DB: farmgate_db
-    ports:
-      - "5433:5432"
+      POSTGRES_DB: ${DB_NAME}          # nom de la base de données
+      POSTGRES_USER: ${DB_USER}        # utilisateur PostgreSQL
+      POSTGRES_PASSWORD: ${DB_PASSWORD} # mot de passe de cet utilisateur
+
+    # Stocke les données dans un volume nommé "pgdata" :
+    # elles survivent à l'arrêt ou à la suppression du conteneur
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+    # Format "port_machine:port_conteneur"
+    # Depuis ta machine, PostgreSQL est joignable sur le port 5434.
+    # Entre conteneurs, on utilise toujours le port 5432.
+    ports:
+      - "5434:5432"
+
+    # Vérifie régulièrement que PostgreSQL est prêt à accepter des connexions
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]  # commande de test
+      interval: 5s    # teste toutes les 5 secondes
+      timeout: 5s     # échec si le test dure plus de 5 secondes
+      retries: 10     # "unhealthy" après 10 échecs consécutifs
+
+  # ─────────────────────────────────────────────
+  # Service 2 : le backend Django
+  # ─────────────────────────────────────────────
+  backend:
+    # Construit l'image à partir du Dockerfile situé dans ./backend
+    build: ./Backend
+
+    # Commande lancée au démarrage du conteneur :
+    # 1) applique les migrations, 2) démarre le serveur de développement
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+
+    # Synchronise le dossier ./backend de ta machine avec /app dans le conteneur :
+    # tes modifications de code sont prises en compte sans reconstruire l'image
+    volumes:
+      - ./Backend:/app
+
+    # Accès à Django depuis ton navigateur : http://localhost:8000
+    ports:
+      - "8000:8000"
+
+    # Charge les variables du fichier .env dans le conteneur
+    # (DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT)
+    env_file:
+      - .env
+
+    # Attend que la base soit "healthy" avant de démarrer Django
+    depends_on:
+      db:
+        condition: service_healthy
+
+# ─────────────────────────────────────────────
+# Volumes nommés gérés par Docker
+# ─────────────────────────────────────────────
 volumes:
-  pgdata:
+  pgdata:   # données persistantes de PostgreSQL

@@ -57,8 +57,10 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# Frontend React (Vite) autorisé à appeler l'API
+# Frontend Next.js (port 3000) et React (port 5173) autorisés à appeler l'API
 CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]

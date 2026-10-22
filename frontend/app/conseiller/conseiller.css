@@ -1,0 +1,198 @@
+/* ==========================================================
+   LAYOUT CONSEILLER
+   ========================================================== */
+
+/* ── Coquille principale ── */
+.co-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Topbar ── */
+.co-topbar {
+  height: 64px;
+  padding: 0 28px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.co-topbar-logo {
+  display: flex;
+  align-items: center;
+}
+
+.co-topbar-logo img {
+  height: 44px;
+  width: auto;
+  display: block;
+}
+
+.co-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.co-topbar-profile {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.15s, background 0.15s;
+}
+.co-topbar-profile:hover { border-color: var(--green); background: var(--bg); }
+
+.co-topbar-profile-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ── Corps : sidebar + contenu ── */
+.co-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Sidebar ── */
+.co-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 10px;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+/* Items de navigation */
+.co-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+.co-nav-item:hover  { background: var(--bg); color: var(--green); }
+.co-nav-item.active { background: rgba(27,94,32,0.09); color: var(--green); }
+
+.co-nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.co-nav-label { flex: 1; }
+
+.co-nav-dot {
+  width: 8px; height: 8px;
+  background: var(--gold);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Contenu principal ── */
+.co-content {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  background: var(--bg); /* Même fond que l'agriculteur */
+}
+
+/* ==========================================================
+   DASHBOARD CONSEILLER
+   ========================================================== */
+
+.dashboard-page {
+  padding: 32px 28px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ── Hero Welcome Section (version verte) ── */
+.dashboard-hero {
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+  padding: 60px 36px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid rgba(27, 94, 32, 0.1);
+  box-shadow: 0 4px 20px rgba(27, 94, 32, 0.08);
+}
+
+/* Cercle décoratif doré */
+.dashboard-hero::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+.dashboard-hero-text {
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-hello {
+  font-size: 42px;
+  font-weight: 800;
+  color: var(--green);
+  margin: 0 0 8px 0;
+  position: relative;
+  display: inline-block;
+}
+
+/* Ligne dorée sous "Bienvenue" */
+.dashboard-hello::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--gold);
+  border-radius: 2px;
+}
+
+.dashboard-subtitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #4a5568;
+  margin: 16px 0 8px 0;
+}
+
+.dashboard-desc {
+  font-size: 15px;
+  color: #718096;
+  margin: 0;
+  line-height: 1.6;
+  max-width: 500px;
+}

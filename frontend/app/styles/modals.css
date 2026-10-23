@@ -1,0 +1,84 @@
+/* ==========================================================
+   MODALS.CSS - Styles pour les modals et overlays
+
+   UTILISÉ DANS:
+   - agriculteur/campagnes/page.tsx (modal ajouter campagne, modal suppression)
+   - agriculteur/depenses/page.tsx (modal ajouter dépense, modal suppression)
+   - agriculteur/recoltes/page.tsx (modal ajouter récolte, modal suppression)
+   - agriculteur/interventions/page.tsx (modal ajouter intervention, modal suppression)
+   - agriculteur/parcelles/page.tsx (modal ajouter parcelle, modal suppression)
+   - agriculteur/campagnes/[id]/page.tsx (modals divers pour détail campagne)
+
+   DÉPENDANCES:
+   - forms.css (pour les formulaires dans les modals)
+   - buttons.css (pour les boutons Annuler/Confirmer)
+
+   CLASSES PRINCIPALES:
+   - .modal-overlay: Overlay semi-transparent qui couvre tout l'écran
+   - .modal-box: La boîte blanche centrée avec le contenu
+   - .modal-title: Titre du modal
+   - .modal-close: Bouton X pour fermer le modal
+   - .modal-actions: Conteneur pour les boutons d'action (Annuler/Confirmer)
+
+   NOTE: Il y a 2 types de modals:
+   1. Modals de création/ajout (avec formulaire)
+   2. Modals de confirmation de suppression (avec message)
+   Les deux utilisent les mêmes styles de base.
+   ========================================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 16px;
+}
+
+.modal-box {
+  background: var(--white);
+  border-radius: 18px;
+  padding: 32px 28px;
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: var(--bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 18px;
+  transition: background 0.15s;
+}
+.modal-close:hover { background: var(--border); }
+.modal-close::before { content: '×'; }
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}

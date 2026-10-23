@@ -5,6 +5,26 @@ import { api } from '@/lib/api';
 import type { Recolte, Campagne } from '@/lib/types';
 import { formatDate } from '@/lib/utils';
 
+// ── Delete confirmation modal ───────────────────────────────────
+
+function DeleteConfirmModal({ onClose, onConfirm, itemName }: { onClose: () => void; onConfirm: () => void; itemName: string }) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose} aria-label="Fermer"></button>
+        <h2 className="modal-title">Confirmer la suppression</h2>
+        <p style={{ marginBottom: 20, color: 'var(--text)', lineHeight: 1.5 }}>
+          Êtes-vous sûr de vouloir supprimer <strong>{itemName}</strong> ? Cette action est irréversible.
+        </p>
+        <div className="modal-actions">
+          <button type="button" className="btn btn-ghost" onClick={onClose}>Annuler</button>
+          <button type="button" className="btn-delete" onClick={onConfirm}>Supprimer</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Labels ────────────────────────────────────────────────────
 
 const UNITE_LABELS: Record<string, string> = {
@@ -128,6 +148,7 @@ export default function RecoltesPage() {
   const [error, setError] = useState('');
   const [filterUnite, setFilterUnite] = useState<'TOUTES' | 'KG' | 'TONNE' | 'SAC'>('TOUTES');
   const [showModal, setShowModal] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true); setError('');
@@ -159,6 +180,16 @@ export default function RecoltesPage() {
   filtered.forEach((r) => {
     totauxParUnite[r.unite] = (totauxParUnite[r.unite] || 0) + Number(r.quantite);
   });
+
+  const handleDelete = async (id: number) => {
+    try {
+      await api.agriculteur.deleteRecolte(id);
+      setRecoltes(recoltes.filter((r) => r.id !== id));
+      setDeleteId(null);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erreur lors de la suppression.');
+    }
+  };
 
   return (
     <div className="page-container">
@@ -218,6 +249,7 @@ export default function RecoltesPage() {
                 <th>Parcelle</th>
                 <th style={{ textAlign: 'right' }}>Quantité</th>
                 <th>Unité</th>
+                <th style={{ textAlign: 'center' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -238,6 +270,14 @@ export default function RecoltesPage() {
                         {UNITE_LABELS[r.unite] || r.unite}
                       </span>
                     </td>
+                    <td style={{ textAlign: 'center' }}>
+                      <button
+                        className="btn-delete"
+                        onClick={() => setDeleteId(r.id)}
+                      >
+                        Supprimer
+                      </button>
+                    </td>
                   </tr>
                 );
               })}
@@ -246,7 +286,7 @@ export default function RecoltesPage() {
               <tfoot>
                 {Object.entries(totauxParUnite).map(([unite, total]) => (
                   <tr key={unite}>
-                    <td colSpan={3} style={{ fontWeight: 700 }}>
+                    <td colSpan={4} style={{ fontWeight: 700 }}>
                       Total - {UNITE_LABELS[unite] || unite}
                     </td>
                     <td style={{ textAlign: 'right', fontWeight: 700, color: 'var(--green)', whiteSpace: 'nowrap' }}>
@@ -255,6 +295,7 @@ export default function RecoltesPage() {
                     <td style={{ color: 'var(--muted)', fontSize: 12 }}>
                       {UNITE_LABELS[unite] || unite}
                     </td>
+                    <td></td>
                   </tr>
                 ))}
               </tfoot>
@@ -269,6 +310,14 @@ export default function RecoltesPage() {
           onClose={() => setShowModal(false)}
           onCreated={loadData}
           campagnes={campagnes}
+        />
+      )}
+
+      {deleteId && (
+        <DeleteConfirmModal
+          onClose={() => setDeleteId(null)}
+          onConfirm={() => handleDelete(deleteId)}
+          itemName={`la récolte de ${Number(recoltes.find((r) => r.id === deleteId)?.quantite || 0).toLocaleString('fr-FR')} ${UNITE_LABELS[recoltes.find((r) => r.id === deleteId)?.unite || '']}`}
         />
       )}
     </div>

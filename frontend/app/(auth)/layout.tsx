@@ -8,7 +8,7 @@ export default function AuthLayout({
   return (
     <div className="auth-wrapper">
       <div className="auth-container">
-       <img src="/logo-farmgate.svg" alt="FarmGate" width={200} />
+        <img src="/logo-farmgate.svg" alt="FarmGate" width={120} className="auth-logo" />
         <div className="auth-card">
           {children}
         </div>

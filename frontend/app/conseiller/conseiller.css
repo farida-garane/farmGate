@@ -126,73 +126,104 @@
    DASHBOARD CONSEILLER
    ========================================================== */
 
-.dashboard-page {
-  padding: 32px 28px;
-  max-width: 1100px;
-  margin: 0 auto;
+   .dashboard-page {
+  margin-top: 20px;
+  width: 98%;
+  transform: translateX(20px);
 }
 
-/* ── Hero Welcome Section (version verte) ── */
+/* ── Bloc de bienvenue ── */
 .dashboard-hero {
-  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
-  padding: 60px 36px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 420px;
+  padding: 56px;
+  background: linear-gradient(135deg, #E8F5E9 0%, #F7FAF7 65%);
+  border-radius: 10px;
   overflow: hidden;
-  border-radius: 20px;
-  border: 1px solid rgba(27, 94, 32, 0.1);
-  box-shadow: 0 4px 20px rgba(27, 94, 32, 0.08);
 }
 
-/* Cercle décoratif doré */
+/* grand cercle doré très pâle en décoration */
 .dashboard-hero::before {
-  content: '';
+  content: "";
   position: absolute;
-  top: -40px;
-  right: -40px;
-  width: 160px;
-  height: 160px;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  top: -90px;
+  right: -90px;
+  width: 320px;
+  height: 320px;
   border-radius: 50%;
-  opacity: 0.6;
+  background: rgba(245, 166, 35, 0.12);
 }
 
-.dashboard-hero-text {
+.dashboard-hero-text,
+.dashboard-hero .ag-home-actions {
   position: relative;
   z-index: 1;
 }
 
-.dashboard-hello {
-  font-size: 42px;
-  font-weight: 800;
-  color: var(--green);
-  margin: 0 0 8px 0;
-  position: relative;
-  display: inline-block;
+.dashboard-hero-text {
+  max-width: 560px;
 }
 
-/* Ligne dorée sous "Bienvenue" */
+/* ── Textes ── */
+.dashboard-hello {
+  margin: 0;
+  font-size: clamp(2.5rem, 3vw, 4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--green, #1B5E20);
+}
+
+/* petit trait doré sous le titre */
 .dashboard-hello::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: var(--gold);
-  border-radius: 2px;
+  content: "";
+  display: block;
+  width: 64px;
+  height: 5px;
+  margin-top: 16px;
+  border-radius: 3px;
+  background: var(--gold, #F5A623);
 }
 
 .dashboard-subtitle {
-  font-size: 18px;
+  margin: 20px 0 12px;
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
   font-weight: 600;
-  color: #4a5568;
-  margin: 16px 0 8px 0;
+  color: var(--text, #1F2937);
 }
 
 .dashboard-desc {
-  font-size: 15px;
-  color: #718096;
   margin: 0;
-  line-height: 1.6;
-  max-width: 500px;
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--muted, #6B7280);
+}
+
+/* ── Bouton ── */
+.ag-home-actions {
+  margin-top: 32px;
+}
+
+.ag-btn {
+  display: inline-block;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.ag-btn-primary {
+  background: var(--green, #1B5E20);
+  color: #FFFFFF;
+  border: 2px solid var(--green, #1B5E20);
+}
+
+.ag-btn-primary:hover {
+  background: #2E7D32;
+  border-color: #2E7D32;
 }

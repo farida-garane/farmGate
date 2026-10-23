@@ -82,6 +82,8 @@ export default function LoginPage() {
         <Link href="/register" className="auth-link">
           S'inscrire
         </Link>
+        <br />
+       
       </div>
     </div>
   );

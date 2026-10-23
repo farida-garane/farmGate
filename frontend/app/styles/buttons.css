@@ -1,0 +1,81 @@
+/* ==========================================================
+   BUTTONS.CSS - Styles pour tous les boutons
+
+   UTILISÉ DANS:
+   - TOUTES les pages du projet (global)
+
+   DÉPENDANCES:
+   - Aucune (fichier autonome, utilise les variables CSS globales)
+
+   CLASSES PRINCIPALES:
+   - .btn: Classe de base pour tous les boutons
+   - .btn-primary: Bouton principal vert (pleine largeur dans formulaires)
+   - .btn-green: Variante du bouton principal (non full-width)
+   - .btn-ghost: Bouton transparent avec bordure grise
+   - .btn-outline: Bouton transparent avec bordure verte
+   - .btn-sm: Bouton de petite taille
+   - .btn-delete: Bouton de suppression (rouge, ajouté récemment)
+
+   UTILISATION SPÉCIFIQUE:
+   - .btn-primary: Pages d'auth (login/register)
+   - .btn-green: Boutons "Ajouter" dans header agriculteur
+   - .btn-ghost: Boutons "Annuler" dans modals
+   - .btn-delete: Boutons "Supprimer" dans les tableaux
+
+   NOTE: Ces boutons sont utilisés partout dans l'application.
+   ========================================================== */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 44px; padding: 0 20px;
+  border-radius: 10px; border: none;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.btn-primary, .btn-green {
+  background-color: var(--green);
+  color: var(--white);
+  box-shadow: 0 4px 12px rgba(27, 94, 32, 0.25);
+}
+.btn-primary:hover, .btn-green:hover { background-color: var(--gold); }
+.btn-primary:disabled, .btn-green:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1.5px solid var(--border);
+}
+.btn-ghost:hover { border-color: var(--green); color: var(--green); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--green);
+  border: 1.5px solid var(--green);
+}
+.btn-outline:hover { background-color: var(--green); color: var(--white); }
+
+.btn-sm { height: 36px; padding: 0 14px; font-size: 13px; border-radius: 8px; }
+
+.btn-primary { width: 100%; height: 46px; margin-top: 12px; }
+
+.btn-delete {
+  background: transparent;
+  color: #b91c1c;
+  border: 1.5px solid #fca5a5;
+  padding: 6px 12px;
+  height: 32px;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  font-weight: 600;
+}
+.btn-delete:hover {
+  background: #b91c1c;
+  color: var(--white);
+  border-color: #b91c1c;
+}

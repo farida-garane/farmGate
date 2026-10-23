@@ -11,6 +11,110 @@ const TYPE_LABELS: Record<string, string> = {
   PREVENTION: 'Prévention',
 };
 
+// ── Add Recommandation modal ──────────────────────────────────
+
+function AddRecommandationModal({ onClose, onCreated, agriculteurs }: { onClose: () => void; onCreated: () => void; agriculteurs: AgriculteurSuivi[] }) {
+  const [form, setForm] = useState({ agriculteur: '', campagne: '', type: 'ACCOMPAGNEMENT', titre: '', message: '' });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.agriculteur) { setError('Veuillez sélectionner un agriculteur.'); return; }
+    setLoading(true); setError('');
+    try {
+      await api.conseiller.createRecommandation({
+        agriculteur: Number(form.agriculteur),
+        campagne: form.campagne ? Number(form.campagne) : null,
+        type: form.type as 'ACCOMPAGNEMENT' | 'ANALYSE' | 'PREVENTION',
+        titre: form.titre,
+        message: form.message,
+      });
+      onCreated(); onClose();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erreur lors de la création.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose} aria-label="Fermer" />
+        <h2 className="modal-title">Nouvelle recommandation</h2>
+        {error && <div className="error-state">{error}</div>}
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">Agriculteur *</label>
+            <select
+              className="form-select"
+              value={form.agriculteur}
+              onChange={(e) => setForm({ ...form, agriculteur: e.target.value })}
+              required
+            >
+              <option value="">Choisir un agriculteur</option>
+              {agriculteurs.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.username}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Campagne</label>
+            <select
+              className="form-select"
+              value={form.campagne}
+              onChange={(e) => setForm({ ...form, campagne: e.target.value })}
+            >
+              <option value="">Choisir une campagne</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Type *</label>
+            <select
+              className="form-select"
+              value={form.type}
+              onChange={(e) => setForm({ ...form, type: e.target.value })}
+            >
+              <option value="ACCOMPAGNEMENT">Accompagnement</option>
+              <option value="ANALYSE">Analyse</option>
+              <option value="PREVENTION">Prévention</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Titre *</label>
+            <input
+              className="form-input"
+              required
+              value={form.titre}
+              onChange={(e) => setForm({ ...form, titre: e.target.value })}
+              placeholder="Titre de la recommandation"
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Message *</label>
+            <textarea
+              className="form-textarea"
+              required
+              value={form.message}
+              onChange={(e) => setForm({ ...form, message: e.target.value })}
+              placeholder="Contenu de la recommandation..."
+            />
+          </div>
+          <div className="modal-actions">
+            <button type="button" className="btn btn-ghost" onClick={onClose}>Annuler</button>
+            <button type="submit" className="btn btn-green" disabled={loading}>
+              {loading ? 'Envoi en cours...' : 'Envoyer'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function RecommandationsPage() {
   const [recommandations, setRecommandations] = useState<Recommandation[]>([]);
   const [agriculteurs, setAgriculteurs] = useState<AgriculteurSuivi[]>([]);
@@ -82,6 +186,14 @@ export default function RecommandationsPage() {
             );
           })}
         </div>
+      )}
+
+      {showModal && (
+        <AddRecommandationModal
+          onClose={() => setShowModal(false)}
+          onCreated={loadData}
+          agriculteurs={agriculteurs}
+        />
       )}
     </div>
   );

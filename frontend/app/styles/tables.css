@@ -1,0 +1,143 @@
+/* ==========================================================
+   TABLES.CSS - Styles pour tous les tableaux de données
+
+   UTILISÉ DANS:
+   - agriculteur/campagnes/page.tsx (tableau des campagnes)
+   - agriculteur/depenses/page.tsx (tableau des dépenses)
+   - agriculteur/recoltes/page.tsx (tableau des récoltes)
+   - agriculteur/interventions/page.tsx (tableau des interventions)
+   - agriculteur/parcelles/page.tsx (tableau des parcelles)
+
+   DÉPENDANCES:
+   - buttons.css (pour les boutons de suppression dans les tableaux)
+
+   CLASSES PRINCIPALES:
+   - .table-wrapper: Conteneur du tableau avec bordure et ombre
+   - .data-table: Le tableau HTML lui-même
+   - .table-row-clickable: Ligne cliquable (ex: campagnes -> détail)
+   - .table-row-expanded: Ligne étendue (ex: parcelles -> voir campagnes)
+   - .table-expand-btn: Bouton "Voir/Masquer" dans les lignes cliquables
+   - .campagne-chip: Chip/badge pour afficher une campagne dans ligne étendue
+
+   NOTE: Tous les tableaux de l'interface agriculteur utilisent ces styles.
+   Le bouton de suppression (.btn-delete) est ajouté dans la dernière colonne.
+   ========================================================== */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  font-size: 14px;
+  table-layout: auto;
+}
+
+/* ── En-têtes ── */
+.data-table thead tr {
+  background: #f0f5f0;
+}
+
+.data-table thead th {
+  padding: 14px 20px !important;
+  font-size: 11px !important ;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.07em !important;
+  color: var(--muted) !important;
+  white-space: nowrap !important;
+  text-align: left !important;
+  border-bottom: 2px solid var(--border) !important;
+  vertical-align: middle !important;
+}
+
+.data-table thead th:first-child { padding-left: 24px !important; border-radius: 0; }
+.data-table thead th:last-child  { padding-right: 24px !important; }
+
+/* ── Cellules ── */
+.data-table tbody td {
+  padding: 16px 20px !important;
+  color: var(--text) !important;
+  border-bottom: 1px solid var(--border) !important;
+  vertical-align: middle !important;
+  line-height: 1.6 !important;
+}
+
+.data-table tbody td:first-child { padding-left: 24px !important; }
+.data-table tbody td:last-child  { padding-right: 24px !important; }
+
+.data-table tbody tr:last-child td { border-bottom: none !important; }
+
+/* ── Lignes ── */
+.table-row-clickable {
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.table-row-clickable:hover td {
+  background: rgba(27, 94, 32, 0.04) !important;
+}
+
+.table-row-expanded td {
+  background: #f8fbf8 !important;
+  padding: 14px 24px !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+/* ── Pied de tableau ── */
+.data-table tfoot td {
+  padding: 14px 20px !important;
+  border-top: 2px solid var(--border) !important;
+  border-bottom: none !important;
+  background: #f0f5f0 !important;
+  font-weight: 700 !important;
+}
+.data-table tfoot td:first-child { padding-left: 24px !important; }
+.data-table tfoot td:last-child  { padding-right: 24px !important; }
+
+/* ── Bouton expand ── */
+.table-expand-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green);
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  cursor: pointer;
+  transition: all 0.12s;
+  user-select: none;
+}
+.table-expand-btn:hover {
+  background: rgba(27, 94, 32, 0.08);
+  border-color: var(--green);
+}
+
+/* Chip campagne dans la ligne étendue */
+.campagne-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+.campagne-chip:hover {
+  border-color: var(--green);
+  background: rgba(27, 94, 32, 0.05);
+}

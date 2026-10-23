@@ -32,6 +32,11 @@ export default function ConseillerDashboardPage() {
             Accédez à vos agriculteurs, suivez leurs activités et envoyez des recommandations pour optimiser leurs cultures.
           </p>
         </div>
+        <div className="ag-home-actions">
+          <Link href="/conseiller/agriculteurs" className="ag-btn ag-btn-primary">
+            Explorer mon espace→
+          </Link>
+        </div>
       </div>
 
     </div>

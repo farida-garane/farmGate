@@ -1,0 +1,99 @@
+/* ==========================================================
+   CARDS.CSS - Styles pour les cartes et badges
+
+   UTILISÉ DANS:
+   - agriculteur/recommandations/page.tsx (cartes de recommandations)
+   - agriculteur/campagnes/[id]/page.tsx (cartes de bilan)
+
+   DÉPENDANCES:
+   - Aucune (fichier autonome)
+
+   CLASSES PRINCIPALES (CARTES):
+   - .card: Carte de base avec bordure
+   - .card-clickable: Carte cliquable avec hover effect
+   - .card-title: Titre de la carte
+   - .card-meta: Métadonnées de la carte (sous le titre)
+   - .cards-grid: Grille de cartes (grid layout)
+
+   CLASSES PRINCIPALES (BADGES):
+   - .badge: Badge de base
+   - .badge-green: Badge vert (statut actif, récoltes)
+   - .badge-gray: Badge gris (statut inactif, catégories)
+   - .badge-gold: Badge doré (recommandations)
+   - .badge-blue: Badge bleu (interventions type traitement)
+
+   UTILISATION SPÉCIFIQUE:
+   - Cards: Recommandations, bilan campagne
+   - Badges: Statuts campagnes, catégories dépenses, types interventions, unités récoltes
+
+   NOTE: Les badges sont utilisés dans les tableaux (tables.css) pour afficher
+   des statuts et catégories de manière visuelle.
+   ========================================================== */
+
+/* ── CARDS ── */
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.card-clickable {
+  cursor: pointer;
+}
+.card-clickable:hover {
+  border-color: var(--green);
+  box-shadow: 0 4px 16px rgba(27, 94, 32, 0.1);
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.card-meta {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+/* ── BADGES ── */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.badge-green {
+  background: rgba(27, 94, 32, 0.1);
+  color: var(--green);
+}
+
+.badge-gray {
+  background: rgba(107, 114, 128, 0.1);
+  color: var(--muted);
+}
+
+.badge-gold {
+  background: rgba(245, 166, 35, 0.15);
+  color: #b37700;
+}
+
+.badge-blue {
+  background: rgba(37, 99, 235, 0.1);
+  color: #1d4ed8;
+}

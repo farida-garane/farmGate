@@ -87,6 +87,7 @@ export const api = {
       last_name: string;
       telephone?: string;
       localisation?: string;
+      role: 'AGRICULTEUR' | 'CONSEILLER';
       password: string;
       password2: string;
     }) =>
@@ -104,6 +105,10 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(data),
       }),
+    deleteParcelle: (id: number) =>
+      request<void>(`/agriculteur/parcelles/${id}/`, {
+        method: 'DELETE',
+      }),
 
     getCampagnes: (parcelleId?: number) => {
       const query = parcelleId ? `?parcelle=${parcelleId}` : '';
@@ -120,6 +125,10 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(data),
       }),
+    deleteCampagne: (id: number) =>
+      request<void>(`/agriculteur/campagnes/${id}/`, {
+        method: 'DELETE',
+      }),
 
     getInterventions: (campagneId?: number) => {
       const query = campagneId ? `?campagne=${campagneId}` : '';
@@ -129,6 +138,10 @@ export const api = {
       request<Intervention>('/agriculteur/interventions/', {
         method: 'POST',
         body: JSON.stringify(data),
+      }),
+    deleteIntervention: (id: number) =>
+      request<void>(`/agriculteur/interventions/${id}/`, {
+        method: 'DELETE',
       }),
 
     getDepenses: (campagneId?: number) => {
@@ -140,6 +153,10 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(data),
       }),
+    deleteDepense: (id: number) =>
+      request<void>(`/agriculteur/depenses/${id}/`, {
+        method: 'DELETE',
+      }),
 
     getRecoltes: (campagneId?: number) => {
       const query = campagneId ? `?campagne=${campagneId}` : '';
@@ -149,6 +166,10 @@ export const api = {
       request<Recolte>('/agriculteur/recoltes/', {
         method: 'POST',
         body: JSON.stringify(data),
+      }),
+    deleteRecolte: (id: number) =>
+      request<void>(`/agriculteur/recoltes/${id}/`, {
+        method: 'DELETE',
       }),
 
     getRecommandations: () =>

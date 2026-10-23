@@ -1,0 +1,60 @@
+/* ==========================================================
+   FORMS.CSS - Styles pour tous les formulaires
+
+   UTILISÉ DANS:
+   - frontend/app/(auth)/login/page.tsx (formulaire de connexion)
+   - frontend/app/(auth)/register/page.tsx (formulaire d'inscription)
+   - agriculteur/campagnes/page.tsx (modal ajouter campagne)
+   - agriculteur/depenses/page.tsx (modal ajouter dépense)
+   - agriculteur/recoltes/page.tsx (modal ajouter récolte)
+   - agriculteur/interventions/page.tsx (modal ajouter intervention)
+   - agriculteur/parcelles/page.tsx (modal ajouter parcelle)
+   - agriculteur/campagnes/[id]/page.tsx (modals divers)
+
+   DÉPENDANCES:
+   - Aucune (fichier autonome)
+
+   CLASSES PRINCIPALES:
+   - .form-group: Conteneur pour un champ de formulaire (label + input)
+   - .form-label: Label stylisé (uppercase, small, bold)
+   - .form-input: Input texte standard
+   - .form-select: Select dropdown
+   - .form-textarea: Zone de texte multi-lignes
+   - .form-row: Conteneur pour 2 champs côte à côte (grid)
+
+   NOTE: Ces styles sont utilisés dans les modals d'ajout/création
+   sur toutes les pages agriculteur et dans les pages d'auth.
+   ========================================================== */
+
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+
+.form-label {
+  font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text);
+}
+
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 0 14px;
+  background-color: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 15px;
+  color: var(--text);
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-input, .form-select { height: 44px; }
+.form-textarea { padding: 10px 14px; min-height: 80px; resize: vertical; }
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(27, 94, 32, 0.12);
+}
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+@media (max-width: 580px) { .form-row { grid-template-columns: 1fr; } }

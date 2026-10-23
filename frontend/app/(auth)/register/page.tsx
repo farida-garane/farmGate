@@ -15,6 +15,7 @@ export default function RegisterPage() {
     last_name: '',
     telephone: '',
     localisation: '',
+    role: 'AGRICULTEUR',
     password: '',
     password2: '',
   });
@@ -38,8 +39,12 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      await api.auth.register(formData);
-      router.push('/agriculteur');
+      const user = await api.auth.register(formData);
+      if (user.role === 'CONSEILLER') {
+        router.push('/conseiller');
+      } else {
+        router.push('/agriculteur');
+      }
     } catch (err) {
       if (err instanceof ApiError && typeof err.data === 'object' && err.data !== null) {
         const entries = Object.entries(err.data as Record<string, string[]>);
@@ -59,7 +64,7 @@ export default function RegisterPage() {
   return (
     <div>
       <h1 className="auth-title">Inscription</h1>
-      <p className="auth-subtitle">Créez votre compte exploitant agricole sur FarmGate</p>
+      <p className="auth-subtitle">Créez votre compte sur FarmGate</p>
 
       {error && <div className="form-error">{error}</div>}
 
@@ -113,6 +118,20 @@ export default function RegisterPage() {
             required
             autoComplete="email"
           />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Rôle </label>
+          <select
+            name="role"
+            className="form-select"
+            value={formData.role}
+            onChange={handleChange}
+            required
+          >
+            <option value="AGRICULTEUR">Agriculteur</option>
+            <option value="CONSEILLER">Conseiller agricole</option>
+          </select>
         </div>
 
         <div className="form-row">

@@ -6,6 +6,26 @@ import { api } from '@/lib/api';
 import type { Campagne, Parcelle } from '@/lib/types';
 import { formatDate } from '@/lib/utils';
 
+// ── Delete confirmation modal ───────────────────────────────────
+
+function DeleteConfirmModal({ onClose, onConfirm, itemName }: { onClose: () => void; onConfirm: () => void; itemName: string }) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose} aria-label="Fermer"></button>
+        <h2 className="modal-title">Confirmer la suppression</h2>
+        <p style={{ marginBottom: 20, color: 'var(--text)', lineHeight: 1.5 }}>
+          Êtes-vous sûr de vouloir supprimer <strong>{itemName}</strong> ? Cette action est irréversible.
+        </p>
+        <div className="modal-actions">
+          <button type="button" className="btn btn-ghost" onClick={onClose}>Annuler</button>
+          <button type="button" className="btn-delete" onClick={onConfirm}>Supprimer</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Add-Campagne modal ────────────────────────────────────────
 
 function AddCampagneModal({ onClose, onCreated, parcelles }: { onClose: () => void; onCreated: () => void; parcelles: Parcelle[] }) {
@@ -113,6 +133,7 @@ export default function CampagnesPage() {
   const [error, setError] = useState('');
   const [filter, setFilter] = useState<FilterType>('TOUTES');
   const [showModal, setShowModal] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -137,6 +158,16 @@ export default function CampagnesPage() {
     if (filter === 'TOUTES') return true;
     return c.statut === filter;
   });
+
+  const handleDelete = async (id: number) => {
+    try {
+      await api.agriculteur.deleteCampagne(id);
+      setCampagnes(campagnes.filter((c) => c.id !== id));
+      setDeleteId(null);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erreur lors de la suppression.');
+    }
+  };
 
   return (
     <div className="page-container">
@@ -188,6 +219,7 @@ export default function CampagnesPage() {
                 <th>Statut</th>
                 <th>Début</th>
                 <th>Fin</th>
+                <th style={{ textAlign: 'center' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -206,6 +238,14 @@ export default function CampagnesPage() {
                   </td>
                   <td>{formatDate(camp.date_debut)}</td>
                   <td>{camp.date_fin ? formatDate(camp.date_fin) : <span style={{ color: 'var(--muted)' }}>—</span>}</td>
+                  <td style={{ textAlign: 'center' }}>
+                    <button
+                      className="btn-delete"
+                      onClick={(e) => { e.stopPropagation(); setDeleteId(camp.id); }}
+                    >
+                      Supprimer
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -218,6 +258,14 @@ export default function CampagnesPage() {
           onClose={() => setShowModal(false)}
           onCreated={loadData}
           parcelles={parcelles}
+        />
+      )}
+
+      {deleteId && (
+        <DeleteConfirmModal
+          onClose={() => setDeleteId(null)}
+          onConfirm={() => handleDelete(deleteId)}
+          itemName={`la campagne ${campagnes.find((c) => c.id === deleteId)?.culture || ''}`}
         />
       )}
     </div>

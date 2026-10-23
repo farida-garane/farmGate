@@ -1,0 +1,71 @@
+/* ==========================================================
+   STATES.CSS - Styles pour les états (erreur, succès, chargement, vide)
+
+   UTILISÉ DANS:
+   - TOUTES les pages qui affichent des données (global)
+
+   DÉPENDANCES:
+   - Aucune (fichier autonome)
+
+   CLASSES PRINCIPALES:
+   - .form-error, .error-state: Message d'erreur (rouge)
+   - .success-state: Message de succès (vert)
+   - .loading-spinner: Spinner de chargement
+   - .spinner-ring: Animation du spinner
+   - .empty-state: État vide (quand aucune donnée)
+   - .empty-state-icon: Icône pour l'état vide
+   - .empty-state-text: Texte principal de l'état vide
+   - .empty-state-sub: Sous-texte de l'état vide
+   - .empty-state-inline: État vide inline (sans icône)
+
+   UTILISATION SPÉCIFIQUE:
+   - .form-error: Dans les formulaires (auth, modals)
+   - .error-state: Dans les pages quand une erreur survient
+   - .success-state: Après une action réussie
+   - .loading-spinner: Pendant le chargement des données
+   - .empty-state: Quand aucun résultat (ex: "Aucune intervention")
+
+   NOTE: Ces états sont utilisés partout dans l'application pour
+   gérer les retours visuels (chargement, erreurs, résultats vides).
+   ========================================================== */
+
+.form-error, .error-state {
+  padding: 12px 14px;
+  background-color: #fff5f5;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+  font-size: 13px; font-weight: 600;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.success-state {
+  padding: 12px 14px;
+  background-color: #f0fdf0;
+  border: 1px solid var(--border);
+  color: var(--green);
+  font-size: 13px; font-weight: 600;
+  border-radius: 10px;
+}
+
+.loading-spinner {
+  display: flex; align-items: center; gap: 12px;
+  padding: 40px 0; color: var(--muted); font-size: 14px;
+}
+
+.spinner-ring {
+  width: 22px; height: 22px;
+  border: 3px solid var(--border);
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-state { text-align: center; padding: 48px 16px; }
+.empty-state-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-state-text { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.empty-state-sub  { font-size: 13px; color: var(--muted); }
+.empty-state-inline { font-size: 13px; color: var(--muted); padding: 12px 0; }

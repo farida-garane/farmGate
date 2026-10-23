@@ -1,0 +1,58 @@
+/* ==========================================================
+   LAYOUT.CSS - Styles pour le layout des pages
+
+   UTILISÉ DANS:
+   - agriculteur/campagnes/page.tsx
+   - agriculteur/depenses/page.tsx
+   - agriculteur/recoltes/page.tsx
+   - agriculteur/interventions/page.tsx
+   - agriculteur/parcelles/page.tsx
+   - agriculteur/profil/page.tsx
+   - agriculteur/recommandations/page.tsx
+   - agriculteur/page.tsx (page d'accueil agriculteur)
+   - conseiller/page.tsx
+   - conseiller/agriculteurs/page.tsx
+   - conseiller/recommandations/page.tsx
+   - conseiller/profil/page.tsx
+
+   DÉPENDANCES:
+   - Aucune (fichier autonome, définit la structure de base des pages)
+
+   CLASSES PRINCIPALES:
+   - .page-container: Conteneur principal de chaque page (max-width, centré)
+   - .section-header: Header de section avec titre et bouton d'action
+   - .page-title: Titre principal de la page (H1)
+   - .page-subtitle: Sous-titre de la page
+
+   NOTE: Ces styles définissent la structure de base de toutes les pages
+   de l'interface agriculteur et conseiller. Le layout est centré avec
+   une largeur maximale de 1100px.
+   ========================================================== */
+
+.page-container {
+  width: 100%;
+  max-width: 1100px;
+  padding: 32px 28px;
+  margin: 0 auto;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.page-subtitle {
+  font-size: 15px;
+  color: var(--muted);
+  margin-top: 4px;
+}

@@ -1,0 +1,263 @@
+/* ==========================================================
+   COMPONENTS.CSS - Styles pour les composants spécifiques
+
+   UTILISÉ DANS:
+   - agriculteur/depenses/page.tsx (stat-banner, filter-tabs)
+   - agriculteur/recoltes/page.tsx (stat-banner, filter-tabs)
+   - agriculteur/interventions/page.tsx (filter-tabs)
+   - agriculteur/campagnes/page.tsx (filter-tabs)
+   - agriculteur/campagnes/[id]/page.tsx (campagne-header, quick-actions, detail-section, bilan-card)
+   - agriculteur/recommandations/page.tsx (reco-card, reco-header, reco-message)
+   - agriculteur/profil/page.tsx (profil-infos, profil-row)
+
+   DÉPENDANCES:
+   - buttons.css (pour les boutons dans quick-actions et filter-tabs)
+   - cards.css (pour les cartes de bilan et recommandations)
+
+   CLASSES PRINCIPALES:
+
+   STAT BANNER (totaux en haut des pages dépenses/récoltes):
+   - .stat-banner: Conteneur flex pour les statistiques
+   - .stat-banner-item: Carte individuelle de statistique
+   - .stat-banner-label: Label de la statistique (uppercase)
+   - .stat-banner-value: Valeur de la statistique
+   - .stat-banner-value--red: Valeur en rouge (dépenses)
+   - .stat-banner-value--green: Valeur en vert (récoltes)
+
+   FILTER TABS (onglets de filtrage):
+   - .filter-tabs: Conteneur des onglets
+   - .filter-tab: Onglet individuel
+   - .filter-tab.active: Onglet actif (vert)
+
+   CAMPAGNE DETAIL PAGE:
+   - .campagne-header: Header de la page détail campagne
+   - .quick-actions: Conteneur des boutons d'action rapide
+   - .quick-action-btn: Bouton d'action rapide
+   - .detail-section: Section de détail
+   - .section-title: Titre de section
+   - .bilan-card: Carte de bilan financier
+   - .bilan-row: Ligne du bilan
+
+   PARCELLE EXPANDED CAMPAIGNS:
+   - .parcelle-campaigns: Section des campagnes d'une parcelle
+   - .parcelle-campaigns-title: Titre de la section
+   - .parcelle-campaign-item: Item de campagne
+
+   RECOMMANDATIONS:
+   - .reco-card: Carte de recommandation
+   - .reco-card.reco-lue: Carte de recommandation lue (opacity réduite)
+   - .reco-header: Header de la recommandation
+   - .reco-message: Message de la recommandation
+
+   PROFIL:
+   - .profil-infos: Conteneur des informations du profil
+   - .profil-row: Ligne d'information (label + valeur)
+   - .profil-label: Label de l'information (ex: "Nom")
+   - .profil-value: Valeur de l'information (ex: "Jean Dupont")
+
+   NOTE: Ces composants sont spécifiques à certaines pages et ne sont
+   pas utilisés globalement dans toute l'application.
+   ========================================================== */
+
+/* ── STAT BANNER (totaux en haut des pages dépenses/récoltes) ── */
+
+.stat-banner {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.stat-banner-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 20px;
+  min-width: 160px;
+}
+
+.stat-banner-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.stat-banner-value {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.stat-banner-value--red   { color: #b91c1c; }
+.stat-banner-value--green { color: var(--green); }
+
+/* ── FILTER TABS ── */
+
+.filter-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.filter-tab:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.filter-tab.active {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--white);
+}
+
+/* ── CAMPAGNE DETAIL PAGE ── */
+
+.campagne-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.quick-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.quick-action-btn {
+  padding: 9px 18px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.quick-action-btn:hover {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--white);
+}
+
+.detail-section {
+  margin-bottom: 36px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1.5px solid var(--border);
+}
+
+.bilan-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.bilan-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.bilan-value-red  { color: #b91c1c; font-weight: 700; }
+.bilan-value-green { color: var(--green); font-weight: 700; }
+
+/* Parcelle expanded campaigns (kept for backward compatibility) */
+.parcelle-campaigns       { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px; }
+.parcelle-campaigns-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 8px; }
+.parcelle-campaign-item   { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 8px; cursor: pointer; transition: background 0.12s; }
+.parcelle-campaign-item:hover { background: var(--bg); }
+
+/* ── RECOMMANDATIONS ── */
+
+.reco-card {
+  border-left: 4px solid var(--gold);
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.reco-card.reco-lue {
+  border-left-color: var(--border);
+  opacity: 0.75;
+}
+
+.reco-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.reco-message {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* ── PROFIL ── */
+
+.profil-infos {
+  display: flex;
+  flex-direction: column;
+}
+
+.profil-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.profil-row:last-child {
+  border-bottom: none;
+}
+
+.profil-label {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.profil-value {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text);
+  text-align: right;
+}

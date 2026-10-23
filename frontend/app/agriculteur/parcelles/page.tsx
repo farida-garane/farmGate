@@ -6,6 +6,26 @@ import { api } from '@/lib/api';
 import type { Parcelle, Campagne } from '@/lib/types';
 import { formatDate } from '@/lib/utils';
 
+// ── Delete confirmation modal ───────────────────────────────────
+
+function DeleteConfirmModal({ onClose, onConfirm, itemName }: { onClose: () => void; onConfirm: () => void; itemName: string }) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose} aria-label="Fermer"></button>
+        <h2 className="modal-title">Confirmer la suppression</h2>
+        <p style={{ marginBottom: 20, color: 'var(--text)', lineHeight: 1.5 }}>
+          Êtes-vous sûr de vouloir supprimer <strong>{itemName}</strong> ? Cette action est irréversible.
+        </p>
+        <div className="modal-actions">
+          <button type="button" className="btn btn-ghost" onClick={onClose}>Annuler</button>
+          <button type="button" className="btn-delete" onClick={onConfirm}>Supprimer</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Add-Parcelle modal ────────────────────────────────────────
 
 function AddParcelleModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
@@ -97,7 +117,7 @@ function AddParcelleModal({ onClose, onCreated }: { onClose: () => void; onCreat
 
 // ── Parcelles table ────────────────────────────────────────────
 
-function ParcellesTable({ parcelles }: { parcelles: Parcelle[] }) {
+function ParcellesTable({ parcelles, onDelete }: { parcelles: Parcelle[]; onDelete: (id: number) => void }) {
   const router = useRouter();
   const [expanded, setExpanded] = useState<number | null>(null);
   const [campagnesMap, setCampagnesMap] = useState<Record<number, Campagne[]>>({});
@@ -133,6 +153,7 @@ function ParcellesTable({ parcelles }: { parcelles: Parcelle[] }) {
             <th style={{ textAlign: 'right' }}>Superficie (ha)</th>
             <th>Date de création</th>
             <th style={{ textAlign: 'center' }}>Campagnes</th>
+            <th style={{ textAlign: 'center' }}>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -149,10 +170,18 @@ function ParcellesTable({ parcelles }: { parcelles: Parcelle[] }) {
                     {expanded === p.id ? '▲ Masquer' : '▼ Voir'}
                   </span>
                 </td>
+                <td style={{ textAlign: 'center' }}>
+                  <button
+                    className="btn-delete"
+                    onClick={(e) => { e.stopPropagation(); onDelete(p.id); }}
+                  >
+                    Supprimer
+                  </button>
+                </td>
               </tr>
               {expanded === p.id && (
                 <tr key={`${p.id}-expanded`} className="table-row-expanded">
-                  <td colSpan={6}>
+                  <td colSpan={7}>
                     {loadingId === p.id ? (
                       <span style={{ color: 'var(--muted)', fontSize: 13 }}>Chargement...</span>
                     ) : !campagnesMap[p.id] || campagnesMap[p.id].length === 0 ? (
@@ -191,6 +220,7 @@ export default function ParcellesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const loadParcelles = useCallback(async () => {
     setLoading(true);
@@ -206,6 +236,16 @@ export default function ParcellesPage() {
   }, []);
 
   useEffect(() => { loadParcelles(); }, [loadParcelles]);
+
+  const handleDelete = async (id: number) => {
+    try {
+      await api.agriculteur.deleteParcelle(id);
+      setParcelles(parcelles.filter((p) => p.id !== id));
+      setDeleteId(null);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erreur lors de la suppression.');
+    }
+  };
 
   return (
     <div className="page-container">
@@ -230,7 +270,7 @@ export default function ParcellesPage() {
           <button className="btn btn-green" style={{ marginTop: 18 }} onClick={() => setShowModal(true)}>Ajouter une parcelle</button>
         </div>
       ) : (
-        <ParcellesTable parcelles={parcelles} />
+        <ParcellesTable parcelles={parcelles} onDelete={handleDelete} />
       )}
 
       {showModal && (
@@ -238,6 +278,14 @@ export default function ParcellesPage() {
           key="parcelle-modal"
           onClose={() => setShowModal(false)}
           onCreated={loadParcelles}
+        />
+      )}
+
+      {deleteId && (
+        <DeleteConfirmModal
+          onClose={() => setDeleteId(null)}
+          onConfirm={() => handleDelete(deleteId)}
+          itemName={`la parcelle ${parcelles.find((p) => p.id === deleteId)?.nom || ''}`}
         />
       )}
     </div>

@@ -6,6 +6,26 @@ import { api } from '@/lib/api';
 import type { Intervention, Campagne } from '@/lib/types';
 import { formatDate } from '@/lib/utils';
 
+// ── Delete confirmation modal ───────────────────────────────────
+
+function DeleteConfirmModal({ onClose, onConfirm, itemName }: { onClose: () => void; onConfirm: () => void; itemName: string }) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose} aria-label="Fermer"></button>
+        <h2 className="modal-title">Confirmer la suppression</h2>
+        <p style={{ marginBottom: 20, color: 'var(--text)', lineHeight: 1.5 }}>
+          Êtes-vous sûr de vouloir supprimer <strong>{itemName}</strong> ? Cette action est irréversible.
+        </p>
+        <div className="modal-actions">
+          <button type="button" className="btn btn-ghost" onClick={onClose}>Annuler</button>
+          <button type="button" className="btn-delete" onClick={onConfirm}>Supprimer</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Labels ────────────────────────────────────────────────────
 
 const INTERVENTION_LABELS: Record<string, string> = {
@@ -135,6 +155,7 @@ export default function InterventionsPage() {
   const [error, setError] = useState('');
   const [filter, setFilter] = useState<FilterType>('TOUTES');
   const [showModal, setShowModal] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true); setError('');
@@ -161,6 +182,16 @@ export default function InterventionsPage() {
 
   // Map campagne id → infos
   const campagneMap = Object.fromEntries(campagnes.map((c) => [c.id, c]));
+
+  const handleDelete = async (id: number) => {
+    try {
+      await api.agriculteur.deleteIntervention(id);
+      setInterventions(interventions.filter((i) => i.id !== id));
+      setDeleteId(null);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erreur lors de la suppression.');
+    }
+  };
 
   return (
     <div className="page-container">
@@ -212,6 +243,7 @@ export default function InterventionsPage() {
                 <th>Campagne</th>
                 <th>Parcelle</th>
                 <th>Description</th>
+                <th style={{ textAlign: 'center' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -236,6 +268,14 @@ export default function InterventionsPage() {
                     <td style={{ color: i.description ? 'var(--text)' : 'var(--muted)' }}>
                       {i.description || '—'}
                     </td>
+                    <td style={{ textAlign: 'center' }}>
+                      <button
+                        className="btn-delete"
+                        onClick={(e) => { e.stopPropagation(); setDeleteId(i.id); }}
+                      >
+                        Supprimer
+                      </button>
+                    </td>
                   </tr>
                 );
               })}
@@ -250,6 +290,14 @@ export default function InterventionsPage() {
           onClose={() => setShowModal(false)}
           onCreated={loadData}
           campagnes={campagnes}
+        />
+      )}
+
+      {deleteId && (
+        <DeleteConfirmModal
+          onClose={() => setDeleteId(null)}
+          onConfirm={() => handleDelete(deleteId)}
+          itemName={`l'intervention ${INTERVENTION_LABELS[interventions.find((i) => i.id === deleteId)?.type || '']}`}
         />
       )}
     </div>

@@ -10,11 +10,10 @@ export default function RegisterPage() {
 
   const [formData, setFormData] = useState({
     username: '',
-    email: '',
     first_name: '',
     last_name: '',
     telephone: '',
-    localisation: '',
+    Localité: '',
     role: 'AGRICULTEUR',
     password: '',
     password2: '',
@@ -23,7 +22,7 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -40,6 +39,7 @@ export default function RegisterPage() {
 
     try {
       const user = await api.auth.register(formData);
+      localStorage.setItem('farmgate_user', JSON.stringify(user));
       if (user.role === 'CONSEILLER') {
         router.push('/conseiller');
       } else {
@@ -108,19 +108,6 @@ export default function RegisterPage() {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Adresse e-mail</label>
-          <input
-            type="email"
-            name="email"
-            className="form-input"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            autoComplete="email"
-          />
-        </div>
-
-        <div className="form-group">
           <label className="form-label">Rôle </label>
           <select
             name="role"
@@ -146,12 +133,12 @@ export default function RegisterPage() {
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Localisation</label>
+            <label className="form-label">Localité</label>
             <input
               type="text"
-              name="localisation"
+              name="Localité"
               className="form-input"
-              value={formData.localisation}
+              value={formData.Localité}
               onChange={handleChange}
             />
           </div>

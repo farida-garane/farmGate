@@ -44,11 +44,21 @@ const NAV = [
 export default function ConseillerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [hasUnread, setHasUnread] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
 
   useEffect(() => {
     api.conseiller.getRecommandations()
       .then((r: Recommandation[]) => setHasUnread(r.some((x) => !x.lue)))
       .catch(() => {});
+
+    try {
+      const stored = localStorage.getItem('farmgate_user');
+      if (stored) {
+        const u = JSON.parse(stored);
+        const name = [u.first_name, u.last_name].filter(Boolean).join(' ') || u.username || null;
+        setUserName(name);
+      }
+    } catch { /* ignore */ }
   }, [pathname]);
 
   const isActive = (href: string) =>
@@ -68,7 +78,9 @@ export default function ConseillerLayout({ children }: { children: React.ReactNo
         <div className="co-topbar-actions">
           {/* Profil */}
           <Link href="/conseiller/profil" className="co-topbar-profile">
-            <span className="co-topbar-profile-label">Profil</span>
+            <span className="co-topbar-profile-label">
+              {userName ?? 'Profil'}
+            </span>
             <IconChevron />
           </Link>
         </div>

@@ -1,19 +1,37 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { api, ApiError } from '@/lib/api';
 import type { User } from '@/lib/types';
 
 export default function ProfilPage() {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem('farmgate_user');
-    if (stored) {
-      try { setUser(JSON.parse(stored)); } catch { /* ignore */ }
-    }
-    setLoading(false);
-  }, []);
+    // 1. Affichage immédiat depuis le localStorage (évite le flash vide)
+    try {
+      const stored = localStorage.getItem('farmgate_user');
+      if (stored) setUser(JSON.parse(stored));
+    } catch { /* ignore */ }
+    setLoading(false); // On affiche tout de suite ce qu'on a
+
+    // 2. Synchronisation avec le serveur pour avoir les données à jour
+    api.auth.me()
+      .then((u) => {
+        setUser(u);
+        localStorage.setItem('farmgate_user', JSON.stringify(u));
+      })
+      .catch((err) => {
+        if (err instanceof ApiError && err.status === 403) {
+          // Session expirée → redirection vers la connexion
+          localStorage.removeItem('farmgate_user');
+          router.push('/login');
+        }
+      });
+  }, [router]);
 
   if (loading) {
     return (

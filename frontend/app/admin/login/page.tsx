@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api, ApiError } from '@/lib/api';
 
@@ -20,7 +19,9 @@ export default function AdminLoginPage() {
 
     try {
       const user = await api.auth.login({ username, password });
-      if (user.role === 'ADMIN') {
+      // Seuls les comptes is_staff (superuser ou staff Django) peuvent accéder à l'admin
+      if (user.is_staff) {
+        localStorage.setItem('farmgate_user', JSON.stringify(user));
         router.push('/admin');
       } else {
         setError('Accès réservé aux administrateurs.');
@@ -48,40 +49,40 @@ export default function AdminLoginPage() {
           <h1 className="auth-title">Connexion Administrateur</h1>
           <p className="auth-subtitle">Accès réservé au personnel administratif</p>
 
-      {error && <div className="form-error">{error}</div>}
+          {error && <div className="form-error">{error}</div>}
 
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label className="form-label">Nom d'utilisateur</label>
-          <input
-            type="text"
-            className="form-input"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            autoComplete="username"
-          />
-        </div>
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label className="form-label">Nom d&apos;utilisateur</label>
+              <input
+                type="text"
+                className="form-input"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                autoComplete="username"
+              />
+            </div>
 
-        <div className="form-group">
-          <label className="form-label">Mot de passe</label>
-          <input
-            type="password"
-            className="form-input"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete="current-password"
-          />
-        </div>
+            <div className="form-group">
+              <label className="form-label">Mot de passe</label>
+              <input
+                type="password"
+                className="form-input"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+              />
+            </div>
 
-        <button type="submit" disabled={isLoading} className="btn-primary">
-          {isLoading ? 'Connexion en cours...' : 'Se connecter'}
-        </button>
-      </form>
+            <button type="submit" disabled={isLoading} className="btn-primary">
+              {isLoading ? 'Connexion en cours...' : 'Se connecter'}
+            </button>
+          </form>
 
-      <div className="auth-footer">
-      </div>
+          <div className="auth-footer">
+          </div>
         </div>
       </div>
     </div>

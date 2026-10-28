@@ -4,7 +4,7 @@ import './agri.css';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
-import { api } from '@/lib/api';
+import { api, ApiError } from '@/lib/api';
 import type { Recommandation } from '@/lib/types';
 
 /* ── Icônes SVG ───────────────────────────────────────────────── */
@@ -108,11 +108,34 @@ function NavInner({ hasUnread }: { hasUnread: boolean }) {
    ───────────────────────────────────────────────────────────────── */
 export default function AgriculteurLayout({ children }: { children: React.ReactNode }) {
   const [hasUnread, setHasUnread] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
-    api.agriculteur.getRecommandations()
-      .then((r: Recommandation[]) => setHasUnread(r.some((x) => !x.lue)))
-      .catch(() => {});
+    // Vérification de session : si non connecté ou mauvais rôle → /login
+    import('@/lib/api').then(({ api, ApiError }) => {
+      api.auth.me()
+        .then((u) => {
+          if (u.role !== 'AGRICULTEUR') {
+            window.location.href = '/login';
+            return;
+          }
+          localStorage.setItem('farmgate_user', JSON.stringify(u));
+          const name = [u.first_name, u.last_name].filter(Boolean).join(' ') || u.username || null;
+          setUserName(name);
+          setAuthChecked(true);
+          // Charger les recommandations pour le badge
+          api.agriculteur.getRecommandations()
+            .then((r: import('@/lib/types').Recommandation[]) => setHasUnread(r.some((x) => !x.lue)))
+            .catch(() => {});
+        })
+        .catch((err: unknown) => {
+          if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
+            localStorage.removeItem('farmgate_user');
+          }
+          window.location.href = '/login';
+        });
+    });
   }, []);
 
   return (
@@ -129,7 +152,9 @@ export default function AgriculteurLayout({ children }: { children: React.ReactN
             {hasUnread && <span className="ag-badge-dot" />}
           </Link>
           <Link href="/agriculteur/profil" className="ag-topbar-profile">
-            <span className="ag-topbar-profile-label">Profil</span>
+            <span className="ag-topbar-profile-label">
+              {userName ?? 'Profil'}
+            </span>
             <IconChevron />
           </Link>
         </div>

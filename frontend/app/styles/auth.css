@@ -5,7 +5,7 @@
    - frontend/app/(auth)/login/page.tsx (connexion agriculteur et conseiller agricole)
    - frontend/app/(auth)/register/page.tsx (inscription avec choix de rôle)
    - frontend/app/(auth)/layout.tsx (layout commun auth)
-   - frontend/app/admin/login/page.tsx (connexion administrateur)
+   - frontend/app/admin/login/page.tsx (connexion administrateur - utilise les mêmes classes manuellement)
 
    DÉPENDANCES:
    - forms.css (pour les formulaires de connexion/inscription)

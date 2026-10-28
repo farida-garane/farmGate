@@ -231,7 +231,6 @@
 }
 
 /* ── PROFIL ── */
-
 .profil-infos {
   display: flex;
   flex-direction: column;
@@ -243,7 +242,7 @@
   justify-content: space-between;
   gap: 16px;
   padding: 16px 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border, #C8DEC8);
 }
 
 .profil-row:last-child {
@@ -252,12 +251,12 @@
 
 .profil-label {
   font-size: 0.95rem;
-  color: var(--muted);
+  color: var(--muted, #6B7280);
 }
 
 .profil-value {
   font-size: 1rem;
   font-weight: 500;
-  color: var(--text);
+  color: var(--text, #1F2937);
   text-align: right;
 }

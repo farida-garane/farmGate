@@ -95,6 +95,9 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(userData),
       }),
+    me: () => request<User>('/auth/me/'),
+    logout: () =>
+      request<void>('/auth/logout/', { method: 'POST' }),
   },
 
   // Espace Agriculteur
@@ -177,6 +180,19 @@ export const api = {
     lireRecommandation: (id: number) =>
       request<Recommandation>(`/conseiller/mes-recommandations/${id}/lire/`, {
         method: 'POST',
+      }),
+  },
+
+  // Espace Admin
+  admin: {
+    getAllUsers: () => request<any[]>('/admin/users/'),
+    toggleUserActive: (id: number) =>
+      request<void>(`/admin/users/${id}/toggle-active/`, {
+        method: 'POST',
+      }),
+    deleteUser: (id: number) =>
+      request<void>(`/admin/users/${id}/`, {
+        method: 'DELETE',
       }),
   },
 

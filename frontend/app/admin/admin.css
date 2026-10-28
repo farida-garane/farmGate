@@ -1,0 +1,249 @@
+/* ==========================================================
+   LAYOUT ADMINISTRATEUR
+
+   UTILISÉ DANS:
+   - frontend/app/admin/layout.tsx (layout principal admin)
+   - frontend/app/admin/page.tsx (accueil admin)
+   - frontend/app/admin/agriculteurs/page.tsx (page agriculteurs)
+   - frontend/app/admin/conseillers/page.tsx (page conseillers)
+   - frontend/app/admin/profil/page.tsx (page profil admin)
+
+   DÉPENDANCES:
+   - buttons.css (pour les boutons)
+   - forms.css (pour les formulaires)
+   - tables.css (pour les tableaux)
+   - cards.css (pour les cartes)
+   - components.css (pour les styles profil-infos)
+
+   CLASSES PRINCIPALES:
+   - .admin-shell: Conteneur principal avec layout flex
+   - .admin-topbar: Barre supérieure avec logo et actions
+   - .admin-sidebar: Barre latérale de navigation
+   - .admin-content: Zone de contenu principal
+   - .admin-nav-item: Item de navigation dans la sidebar
+   - .admin-dashboard-hero: Bloc de bienvenue sur l'accueil
+
+   NOTE: Ce fichier reproduit le design de l'interface agriculteur
+   (agri.css) mais adapté pour l'interface administrateur.
+   ========================================================== */
+
+/* ── Coquille principale ── */
+.admin-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Topbar ── */
+.admin-topbar {
+  height: 64px;
+  padding: 0 28px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.admin-topbar-logo {
+  display: flex;
+  align-items: center;
+}
+
+.admin-topbar-logo img {
+  height: 44px;
+  width: auto;
+  display: block;
+}
+
+.admin-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-topbar-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.admin-topbar-icon:hover { background: var(--bg); color: var(--green); }
+
+.admin-topbar-profile {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.15s, background 0.15s;
+}
+.admin-topbar-profile:hover { border-color: var(--green); background: var(--bg); }
+
+.admin-topbar-profile-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ── Corps : sidebar + contenu ── */
+.admin-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Sidebar ── */
+.admin-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 10px;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+/* Items de navigation */
+.admin-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+.admin-nav-item:hover  { background: var(--bg); color: var(--green); }
+.admin-nav-item.active { background: rgba(27,94,32,0.09); color: var(--green); }
+
+.admin-nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.admin-nav-label { flex: 1; }
+
+/* ── Contenu principal ── */
+.admin-content {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  background: var(--bg);
+  padding: 32px 28px;
+}
+
+/* ==========================================================
+   DASHBOARD ADMIN
+   ========================================================== */
+
+.admin-dashboard-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 420px;
+  padding: 56px;
+  background: linear-gradient(135deg, #E8F5E9 0%, #F7FAF7 65%);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.admin-dashboard-hero::before {
+  content: "";
+  position: absolute;
+  top: -90px;
+  right: -90px;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: rgba(245, 166, 35, 0.12);
+}
+
+.admin-dashboard-hero-text {
+  position: relative;
+  z-index: 1;
+  max-width: 560px;
+}
+
+.admin-dashboard-hello {
+  margin: 0;
+  font-size: clamp(2.5rem, 3vw, 4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--green);
+}
+
+.admin-dashboard-hello::after {
+  content: "";
+  display: block;
+  width: 64px;
+  height: 5px;
+  margin-top: 16px;
+  border-radius: 3px;
+  background: var(--gold);
+}
+
+.admin-dashboard-subtitle {
+  margin: 20px 0 12px;
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.admin-dashboard-desc {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.admin-dashboard-actions {
+  margin-top: 32px;
+  position: relative;
+  z-index: 1;
+}
+
+.admin-btn {
+  display: inline-block;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.admin-btn-primary {
+  background: var(--green);
+  color: #FFFFFF;
+  border: 2px solid var(--green);
+}
+
+.admin-btn-primary:hover {
+  background: #2E7D32;
+  border-color: #2E7D32;
+}

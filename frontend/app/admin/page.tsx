@@ -17,7 +17,7 @@ export default function AdminHomePage() {
         </div>
         <div className="admin-dashboard-actions">
           <Link href="/admin/agriculteurs" className="admin-btn admin-btn-primary">
-            Voir les agriculteurs →
+            Explorer mon espace
           </Link>
         </div>
       </div>

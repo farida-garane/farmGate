@@ -79,3 +79,10 @@
   color: var(--white);
   border-color: #b91c1c;
 }
+
+.btn-orange {
+  background-color: var(--gold);
+  color: var(--white);
+  box-shadow: 0 4px 12px rgba(245, 166, 35, 0.25);
+}
+.btn-orange:hover { background-color: #d97706; }

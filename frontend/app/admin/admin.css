@@ -97,6 +97,9 @@
   font-weight: 600;
   color: var(--text);
 }
+.admin-nav-profil {
+  margin-top: auto;
+}
 
 /* ── Corps : sidebar + contenu ── */
 .admin-body {

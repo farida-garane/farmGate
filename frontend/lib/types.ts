@@ -12,14 +12,14 @@ export interface User {
   role: Role;
   is_staff: boolean;
   telephone: string | null;
-  localisation: string | null;
+  localite: string | null;
 }
 
 export interface Parcelle {
   id: number;
   nom: string;
   superficie: string | number;
-  localisation: string;
+  localite: string;
   type_sol: string;
   date_creation: string;
   agriculteur?: number;

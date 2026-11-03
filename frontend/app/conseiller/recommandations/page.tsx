@@ -162,29 +162,40 @@ export default function RecommandationsPage() {
           <div className="empty-state-sub">Envoyez votre première recommandation à un agriculteur.</div>
         </div>
       ) : (
-        <div className="cards-grid" style={{ gridTemplateColumns: '1fr' }}>
-          {recommandations.map((r) => {
-            const agri = agriculteurs.find((a) => a.id === r.agriculteur);
-            return (
-              <div key={r.id} className={`card reco-card${r.lue ? ' reco-lue' : ''}`}>
-                <div className="reco-header">
-                  <div>
-                    <div className="card-title">{r.titre}</div>
-                    <div className="card-meta" style={{ marginTop: 4 }}>
-                      {TYPE_LABELS[r.type] || r.type}
-                      {agri ? ` · ${agri.username}` : ''}
-                      {' · '}
-                      {formatDate(r.date_creation)}
-                    </div>
-                  </div>
-                  <span className={`badge ${r.lue ? 'badge-gray' : 'badge-gold'}`}>
-                    {r.lue ? 'Lue' : 'Non lue'}
-                  </span>
-                </div>
-                <p className="reco-message">{r.message}</p>
-              </div>
-            );
-          })}
+        <div className="table-wrapper">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Titre</th>
+                <th>Type</th>
+                <th>Agriculteur</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Message</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recommandations.map((r) => {
+                const agri = agriculteurs.find((a) => a.id === r.agriculteur);
+                return (
+                  <tr key={r.id}>
+                    <td style={{ fontWeight: 600 }}>{r.titre}</td>
+                    <td>{TYPE_LABELS[r.type] || r.type}</td>
+                    <td>{agri ? agri.username : '—'}</td>
+                    <td>{formatDate(r.date_creation)}</td>
+                    <td>
+                      <span className={`badge ${r.lue ? 'badge-gray' : 'badge-gold'}`}>
+                        {r.lue ? 'Lue' : 'Non lue'}
+                      </span>
+                    </td>
+                    <td style={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {r.message}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
 

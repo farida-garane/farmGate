@@ -21,7 +21,9 @@ export default function LoginPage() {
     try {
       const user = await api.auth.login({ username, password });
       localStorage.setItem('farmgate_user', JSON.stringify(user));
-      if (user.role === 'CONSEILLER') {
+      if (user.is_staff) {
+        router.push('/admin');
+      } else if (user.role === 'CONSEILLER') {
         router.push('/conseiller');
       } else {
         router.push('/agriculteur');

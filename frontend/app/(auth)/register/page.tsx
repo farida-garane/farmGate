@@ -10,10 +10,11 @@ export default function RegisterPage() {
 
   const [formData, setFormData] = useState({
     username: '',
+    email: '',
     first_name: '',
     last_name: '',
     telephone: '',
-    Localité: '',
+    localite: '',
     role: 'AGRICULTEUR',
     password: '',
     password2: '',
@@ -108,6 +109,19 @@ export default function RegisterPage() {
         </div>
 
         <div className="form-group">
+          <label className="form-label">Email</label>
+          <input
+            type="email"
+            name="email"
+            className="form-input"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            autoComplete="email"
+          />
+        </div>
+
+        <div className="form-group">
           <label className="form-label">Rôle </label>
           <select
             name="role"
@@ -136,9 +150,9 @@ export default function RegisterPage() {
             <label className="form-label">Localité</label>
             <input
               type="text"
-              name="Localité"
+              name="localite"
               className="form-input"
-              value={formData.Localité}
+              value={formData.localite}
               onChange={handleChange}
             />
           </div>

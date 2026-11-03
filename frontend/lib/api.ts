@@ -52,10 +52,11 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
   if (!response.ok) {
     let errorData: unknown;
+    const text = await response.text();
     try {
-      errorData = await response.json();
+      errorData = JSON.parse(text);
     } catch {
-      errorData = await response.text();
+      errorData = text;
     }
     const message =
       typeof errorData === 'object' && errorData !== null && 'detail' in errorData
@@ -86,7 +87,7 @@ export const api = {
       first_name: string;
       last_name: string;
       telephone?: string;
-      localisation?: string;
+      localite?: string;
       role: 'AGRICULTEUR' | 'CONSEILLER';
       password: string;
       password2: string;
@@ -186,6 +187,24 @@ export const api = {
   // Espace Admin
   admin: {
     getAllUsers: () => request<any[]>('/admin/users/'),
+    createUser: (data: {
+      last_name: string;
+      first_name: string;
+      telephone: string;
+      email: string;
+      localite: string;
+      password: string;
+      role: 'AGRICULTEUR' | 'CONSEILLER';
+    }) =>
+      request<any>('/admin/users/create/', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    changeStatut: (id: number, statut: 'ACTIF' | 'INACTIF' | 'SUPPRIME') =>
+      request<any>(`/admin/users/${id}/statut/`, {
+        method: 'POST',
+        body: JSON.stringify({ statut }),
+      }),
     toggleUserActive: (id: number) =>
       request<void>(`/admin/users/${id}/toggle-active/`, {
         method: 'POST',
@@ -194,13 +213,15 @@ export const api = {
       request<void>(`/admin/users/${id}/`, {
         method: 'DELETE',
       }),
+    getUserDetail: (id: number) =>
+      request<any>(`/admin/users/${id}/`),
   },
 
   // Espace Conseiller
   conseiller: {
-    getAgriculteurs: (params?: { localisation?: string; search?: string }) => {
+    getAgriculteurs: (params?: { localite?: string; search?: string }) => {
       const sp = new URLSearchParams();
-      if (params?.localisation) sp.set('localisation', params.localisation);
+      if (params?.localite) sp.set('localite', params.localite);
       if (params?.search) sp.set('search', params.search);
       const qs = sp.toString() ? `?${sp.toString()}` : '';
       return request<AgriculteurSuivi[]>(`/conseiller/agriculteurs/${qs}`);

@@ -71,7 +71,7 @@ function AddParcelleModal({ onClose, onCreated }: { onClose: () => void; onCreat
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Superficie (ha) *</label>
+            <label className="form-label">Superficie (ha) </label>
             <input
               className="form-input"
               type="number"
@@ -84,7 +84,7 @@ function AddParcelleModal({ onClose, onCreated }: { onClose: () => void; onCreat
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Localisation *</label>
+            <label className="form-label">Localisation </label>
             <input
               className="form-input"
               required

@@ -3,8 +3,8 @@
 import './conseiller.css';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { useEffect, useState, Suspense } from 'react';
+import { api, ApiError } from '@/lib/api';
 import type { Recommandation } from '@/lib/types';
 
 /* ── Icônes SVG ───────────────────────────────────── */
@@ -33,6 +33,18 @@ const IconChevron = () => (
     <polyline points="6 9 12 15 18 9"/>
   </svg>
 );
+const IconBell = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+  </svg>
+);
+const IconLogout = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+    <polyline points="16 17 21 12 16 7"/>
+    <line x1="21" y1="12" x2="9" y2="12"/>
+  </svg>
+);
 
 const NAV = [
   { href: '/conseiller',               label: 'Accueil',         icon: <IconHome /> },
@@ -45,21 +57,36 @@ export default function ConseillerLayout({ children }: { children: React.ReactNo
   const pathname = usePathname();
   const [hasUnread, setHasUnread] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
-    api.conseiller.getRecommandations()
-      .then((r: Recommandation[]) => setHasUnread(r.some((x) => !x.lue)))
-      .catch(() => {});
-
-    try {
-      const stored = localStorage.getItem('farmgate_user');
-      if (stored) {
-        const u = JSON.parse(stored);
+    // Vérification de session : si non connecté ou mauvais rôle → /login
+    api.auth.me()
+      .then((u) => {
+        if (u.role !== 'CONSEILLER' && !u.is_staff) {
+          window.location.href = '/login';
+          return;
+        }
+        localStorage.setItem('farmgate_user', JSON.stringify(u));
         const name = [u.first_name, u.last_name].filter(Boolean).join(' ') || u.username || null;
         setUserName(name);
-      }
-    } catch { /* ignore */ }
-  }, [pathname]);
+        setAuthChecked(true);
+        // Charger les recommandations pour le badge
+        api.conseiller.getRecommandations()
+          .then((r: Recommandation[]) => setHasUnread(r.some((x) => !x.lue)))
+          .catch(() => {});
+      })
+      .catch((err: unknown) => {
+        if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
+          localStorage.removeItem('farmgate_user');
+        }
+        window.location.href = '/login';
+      });
+  }, []);
+
+  if (!authChecked) {
+    return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>Chargement...</div>;
+  }
 
   const isActive = (href: string) =>
     href === '/conseiller' ? pathname === href : pathname.startsWith(href);
@@ -76,13 +103,28 @@ export default function ConseillerLayout({ children }: { children: React.ReactNo
 
         {/* Actions droite */}
         <div className="co-topbar-actions">
-          {/* Profil */}
+          <div className="co-topbar-icon" aria-label="Notifications">
+            <IconBell />
+            {hasUnread && <span className="co-badge-dot" />}
+          </div>
           <Link href="/conseiller/profil" className="co-topbar-profile">
             <span className="co-topbar-profile-label">
-              {userName ?? 'Profil'}
+              {userName ?? 'Connexion'}
             </span>
-            <IconChevron />
           </Link>
+          <button
+            onClick={() => {
+              localStorage.removeItem('farmgate_user');
+              window.location.href = '/login';
+            }}
+            className="co-topbar-icon"
+            aria-label="Déconnexion"
+            style={{
+              cursor: 'pointer',
+            }}
+          >
+            <IconLogout />
+          </button>
         </div>
       </header>
 

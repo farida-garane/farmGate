@@ -57,4 +57,13 @@
 
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
+.form-value {
+  padding: 10px 14px;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 15px;
+  color: var(--text);
+}
+
 @media (max-width: 580px) { .form-row { grid-template-columns: 1fr; } }

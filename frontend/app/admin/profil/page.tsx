@@ -1,21 +1,24 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { api, ApiError } from '@/lib/api';
 
 export default function AdminProfilPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const stored = localStorage.getItem('farmgate_user');
-        if (stored) {
-          const userData = JSON.parse(stored);
-          setUser(userData);
+        const currentUser = await api.auth.me();
+        setUser(currentUser);
+      } catch (err: unknown) {
+        if (err instanceof ApiError) {
+          setError(err.message || 'Erreur lors du chargement du profil.');
+        } else {
+          setError('Erreur inconnue.');
         }
-      } catch (err) {
-        console.error('Erreur:', err);
       } finally {
         setLoading(false);
       }
@@ -25,6 +28,10 @@ export default function AdminProfilPage() {
 
   if (loading) {
     return <div className="loading-spinner"><div className="spinner-ring" /> Chargement...</div>;
+  }
+
+  if (error) {
+    return <div className="error-state">{error}</div>;
   }
 
   if (!user) {

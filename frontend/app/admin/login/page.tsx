@@ -19,7 +19,7 @@ export default function AdminLoginPage() {
 
     try {
       const user = await api.auth.login({ username, password });
-      // Seuls les comptes is_staff (superuser ou staff Django) peuvent accéder à l'admin
+      // Seuls les comptes is_staff (créés via Django) peuvent accéder à l'admin
       if (user.is_staff) {
         localStorage.setItem('farmgate_user', JSON.stringify(user));
         router.push('/admin');

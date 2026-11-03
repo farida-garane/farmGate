@@ -63,16 +63,23 @@ const IconClipboard = () => (
     <line x1="9" y1="16" x2="13" y2="16"/>
   </svg>
 );
+const IconLogout = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+    <polyline points="16 17 21 12 16 7"/>
+    <line x1="21" y1="12" x2="9" y2="12"/>
+  </svg>
+);
 
 const NAV = [
-  { href: '/agriculteur',                 label: 'Accueil',         icon: <IconHome /> },
-  { href: '/agriculteur/parcelles',       label: 'Parcelles',       icon: <IconMap /> },
-  { href: '/agriculteur/campagnes',       label: 'Campagnes',       icon: <IconLayers /> },
-  { href: '/agriculteur/interventions',   label: 'Interventions',   icon: <IconTool /> },
-  { href: '/agriculteur/depenses',        label: 'Dépenses',        icon: <IconWallet /> },
-  { href: '/agriculteur/recoltes',        label: 'Récoltes',        icon: <IconSprout /> },
-  { href: '/agriculteur/recommandations', label: 'Recommandations', icon: <IconClipboard /> },
-  { href: '/agriculteur/profil',          label: 'Profil',          icon: <IconUser /> },
+  { nom: 'accueil',         href: '/agriculteur',                 label: 'Accueil',         icon: <IconHome /> },
+  { nom: 'parcelles',       href: '/agriculteur/parcelles',       label: 'Parcelles',       icon: <IconMap /> },
+  { nom: 'campagnes',       href: '/agriculteur/campagnes',       label: 'Campagnes',       icon: <IconLayers /> },
+  { nom: 'interventions',   href: '/agriculteur/interventions',   label: 'Interventions',   icon: <IconTool /> },
+  { nom: 'depenses',        href: '/agriculteur/depenses',        label: 'Dépenses',        icon: <IconWallet /> },
+  { nom: 'recoltes',        href: '/agriculteur/recoltes',        label: 'Récoltes',        icon: <IconSprout /> },
+  { nom: 'recommandations', href: '/agriculteur/recommandations', label: 'Recommandations', icon: <IconClipboard /> },
+  { nom: 'profil',          href: '/agriculteur/profil',          label: 'Profil',          icon: <IconUser /> },
 ];
 
 /* ─────────────────────────────────────────────────────────────────
@@ -90,7 +97,7 @@ function NavInner({ hasUnread }: { hasUnread: boolean }) {
         <Link
           key={item.href}
           href={item.href}
-          className={`ag-nav-item${isActive(item.href) ? ' active' : ''}`}
+         className={`ag-nav-item ag-nav-${item.nom}${isActive(item.href) ? ' active' : ''}`}
         >
           <span className="ag-nav-icon">{item.icon}</span>
           <span className="ag-nav-label">{item.label}</span>
@@ -116,7 +123,7 @@ export default function AgriculteurLayout({ children }: { children: React.ReactN
     import('@/lib/api').then(({ api, ApiError }) => {
       api.auth.me()
         .then((u) => {
-          if (u.role !== 'AGRICULTEUR') {
+          if (u.role !== 'AGRICULTEUR' && !u.is_staff) {
             window.location.href = '/login';
             return;
           }
@@ -153,10 +160,22 @@ export default function AgriculteurLayout({ children }: { children: React.ReactN
           </Link>
           <Link href="/agriculteur/profil" className="ag-topbar-profile">
             <span className="ag-topbar-profile-label">
-              {userName ?? 'Profil'}
+              {userName ?? 'Connexion'}
             </span>
-            <IconChevron />
           </Link>
+          <button
+            onClick={() => {
+              localStorage.removeItem('farmgate_user');
+              window.location.href = '/login';
+            }}
+            className="ag-topbar-icon"
+            aria-label="Déconnexion"
+            style={{
+              cursor: 'pointer',
+            }}
+          >
+            <IconLogout />
+          </button>
         </div>
       </header>
 

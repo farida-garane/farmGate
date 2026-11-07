@@ -11,13 +11,12 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'first_name', 'last_name',
-                  'role', 'is_staff', 'telephone', 'localisation')
+                  'role', 'is_staff', 'is_active', 'telephone', 'localite', 'date_creation', 'statut')
 
 
 class RegisterSerializer(serializers.ModelSerializer):
     """
-    Inscription publique : le compte est toujours créé avec le rôle par défaut
-    (AGRICULTEUR). Seul l'administrateur peut ensuite changer le rôle.
+    Inscription publique : l'utilisateur choisit son rôle (AGRICULTEUR ou CONSEILLER).
     """
 
     password = serializers.CharField(write_only=True)
@@ -26,7 +25,10 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name', 'last_name',
-                  'telephone', 'localisation', 'password', 'password2')
+                  'telephone', 'localite', 'role', 'password', 'password2')
+        extra_kwargs = {
+            'role': {'required': False},  # Défaut = AGRICULTEUR si non fourni
+        }
 
     def validate(self, attrs):
         if attrs['password'] != attrs.pop('password2'):

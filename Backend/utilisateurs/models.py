@@ -8,6 +8,11 @@ class User(AbstractUser):
         AGRICULTEUR = 'AGRICULTEUR', 'Agriculteur'
         CONSEILLER = 'CONSEILLER', 'Conseiller agricole'
 
+    class Statut(models.TextChoices):
+        ACTIF = 'ACTIF', 'Actif'
+        INACTIF = 'INACTIF', 'Inactif'
+        SUPPRIME = 'SUPPRIME', 'Supprimé'
+
     role = models.CharField(
         max_length=20,
         choices=Role.choices,
@@ -20,15 +25,21 @@ class User(AbstractUser):
         null=True,
         verbose_name="Numéro de téléphone",
     )
-    localisation = models.CharField(
+    localite = models.CharField(
         max_length=150,
         blank=True,
         null=True,
-        verbose_name="Localisation / Région",
+        verbose_name="Localité",
     )
     date_creation = models.DateTimeField(
         auto_now_add=True,
         verbose_name="Date d'inscription",
+    )
+    statut = models.CharField(
+        max_length=10,
+        choices=Statut.choices,
+        default=Statut.ACTIF,
+        verbose_name="Statut",
     )
 
     class Meta:

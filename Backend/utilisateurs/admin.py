@@ -12,19 +12,20 @@ class UserAdmin(BaseUserAdmin):
         'last_name',
         'role',
         'telephone',
-        'localisation',
+        'localite',
         'is_staff',
         'is_active',
+        'statut',
     )
-    list_filter = ('role', 'is_staff', 'is_superuser', 'is_active', 'date_joined')
-    search_fields = ('username', 'first_name', 'last_name', 'email', 'telephone', 'localisation')
+    list_filter = ('role', 'statut', 'is_staff', 'is_superuser', 'is_active', 'date_joined')
+    search_fields = ('username', 'first_name', 'last_name', 'email', 'telephone', 'localite')
     ordering = ('-date_joined',)
 
     fieldsets = BaseUserAdmin.fieldsets + (
         (
             'Informations Métier (FarmGate)',
             {
-                'fields': ('role', 'telephone', 'localisation'),
+                'fields': ('role', 'telephone', 'localite'),
             },
         ),
     )
@@ -33,7 +34,7 @@ class UserAdmin(BaseUserAdmin):
         (
             'Informations Métier (FarmGate)',
             {
-                'fields': ('role', 'telephone', 'localisation'),
+                'fields': ('role', 'telephone', 'localite'),
             },
         ),
     )

@@ -22,7 +22,7 @@ class AgriculteurSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'first_name', 'last_name',
-                  'telephone', 'localisation', 'nb_parcelles')
+                  'telephone', 'localite', 'nb_parcelles')
 
 
 class ParcelleConseillerSerializer(ParcelleSerializer):

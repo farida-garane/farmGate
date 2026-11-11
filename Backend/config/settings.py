@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "utilisateurs",
     "agriculteur",
     "technicien",
+    "notifications",
 ]
 
 # Modèle utilisateur personnalisé
@@ -67,6 +68,16 @@ CORS_ALLOWED_ORIGINS = [
 # Le frontend envoie le cookie de session avec ses requêtes
 CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
+
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_HTTPONLY = False
+SESSION_COOKIE_HTTPONLY = True
+
+# Session expire après 24 heures d'inactivité
+SESSION_COOKIE_AGE = 86400          # 86400 secondes = 24 heures
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Garde la session même si on ferme le navigateur (jusqu'aux 24h)
+SESSION_SAVE_EVERY_REQUEST = True   # Renouvelle le délai à chaque requête (inactivité de 24h)
 
 ROOT_URLCONF = "config.urls"
 
@@ -105,9 +116,9 @@ DATABASES = {
 # --- Django REST Framework --------------------------------------------------
 
 REST_FRAMEWORK = {
-    # Connexion par session Django (cookie), sans token pour le moment
+    # Connexion par session Django (cookie) avec gestion des requêtes API cross-origin
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.SessionAuthentication",
+        "utilisateurs.authentication.CsrfExemptSessionAuthentication",
     ),
 }
 

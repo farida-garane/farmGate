@@ -9,6 +9,7 @@ class Recommandation(models.Model):
         ACCOMPAGNEMENT = 'ACCOMPAGNEMENT', 'Accompagnement'
         ANALYSE = 'ANALYSE', "Analyse d'activité"
         PREVENTION = 'PREVENTION', 'Recommandation préventive'
+        REPONSE = 'REPONSE', 'Réponse'
 
     conseiller = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -31,8 +32,18 @@ class Recommandation(models.Model):
         related_name='recommandations',
         verbose_name="Campagne",
     )
+    # Auteur du message : le conseiller pour ses recommandations,
+    # l'agriculteur pour ses réponses. Null sur les anciens messages (= conseiller).
+    auteur = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='messages_ecrits',
+        verbose_name="Auteur",
+    )
     type = models.CharField(max_length=20, choices=Type.choices, verbose_name="Type")
-    titre = models.CharField(max_length=150, verbose_name="Titre")
+    titre = models.CharField(max_length=150, blank=True, default='', verbose_name="Titre")
     message = models.TextField(verbose_name="Message")
     lue = models.BooleanField(default=False, verbose_name="Lue par l'agriculteur")
     date_creation = models.DateTimeField(auto_now_add=True, verbose_name="Date d'envoi")

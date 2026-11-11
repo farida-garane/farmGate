@@ -6,6 +6,7 @@ from rest_framework.response import Response
 
 from agriculteur.models import Campagne, Parcelle
 from agriculteur.views import IsAgriculteur
+from notifications.utils import notifier_recommandation
 
 from .models import Recommandation
 from .serializers import (
@@ -23,7 +24,10 @@ class IsConseiller(permissions.BasePermission):
     message = "Accès réservé aux conseillers agricoles."
 
     def has_permission(self, request, view):
-        return bool(request.user.is_authenticated and request.user.is_conseiller)
+        return bool(
+            request.user.is_authenticated
+            and (request.user.is_conseiller or request.user.is_staff)
+        )
 
 
 # --- Suivi et analyse des agriculteurs (lecture seule) -----------------------
@@ -102,20 +106,38 @@ class RecommandationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Recommandation.objects.filter(
             conseiller=self.request.user
-        ).select_related('agriculteur')
+        ).select_related('agriculteur', 'auteur')
         agriculteur = self.request.query_params.get('agriculteur')
         if agriculteur:
             queryset = queryset.filter(agriculteur_id=agriculteur)
         return queryset
 
     def perform_create(self, serializer):
-        serializer.save(conseiller=self.request.user)
+        recommandation = serializer.save(
+            conseiller=self.request.user, auteur=self.request.user
+        )
+        notifier_recommandation(recommandation)
+
+    @action(detail=True, methods=['post'])
+    def lire(self, request, pk=None):
+        """Marque comme lue une réponse de l'agriculteur."""
+        recommandation = self.get_object()
+        auteur_id = recommandation.auteur_id
+        if auteur_id is None or auteur_id == request.user.id:
+            return Response(
+                {'detail': 'Seules les réponses de l\'agriculteur peuvent être marquées comme lues.'},
+                status=400,
+            )
+        recommandation.lue = True
+        recommandation.save(update_fields=['lue'])
+        return Response(self.get_serializer(recommandation).data)
 
 
 class MesRecommandationsViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    /api/conseiller/mes-recommandations/ : côté agriculteur, les recommandations reçues.
-    POST .../<id>/lire/ marque la recommandation comme lue.
+    /api/conseiller/mes-recommandations/ : côté agriculteur, le fil conseiller ↔ agriculteur.
+    POST .../<id>/lire/ marque le message comme lu.
+    POST .../<id>/repondre/ envoie une réponse au conseiller.
     """
 
     serializer_class = RecommandationRecueSerializer
@@ -124,11 +146,37 @@ class MesRecommandationsViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         return Recommandation.objects.filter(
             agriculteur=self.request.user
-        ).select_related('conseiller')
+        ).select_related('conseiller', 'auteur')
 
     @action(detail=True, methods=['post'])
     def lire(self, request, pk=None):
         recommandation = self.get_object()
+        auteur_id = recommandation.auteur_id or recommandation.conseiller_id
+        if auteur_id == request.user.id:
+            return Response(
+                {'detail': 'Vous ne pouvez pas marquer votre propre message comme lu.'},
+                status=400,
+            )
         recommandation.lue = True
         recommandation.save(update_fields=['lue'])
         return Response(self.get_serializer(recommandation).data)
+
+    @action(detail=True, methods=['post'])
+    def repondre(self, request, pk=None):
+        parent = self.get_object()
+        message = (request.data.get('message') or '').strip()
+        if not message:
+            return Response({'message': 'Le message ne peut pas être vide.'}, status=400)
+        recommandation = Recommandation.objects.create(
+            conseiller=parent.conseiller,
+            agriculteur=request.user,
+            auteur=request.user,
+            campagne=parent.campagne,
+            type=Recommandation.Type.REPONSE,
+            titre='',
+            message=message,
+        )
+        notifier_recommandation(recommandation)
+        return Response(
+            self.get_serializer(recommandation).data, status=201
+        )

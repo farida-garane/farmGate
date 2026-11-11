@@ -21,7 +21,7 @@ class AgriculteurSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name',
+        fields = ('id', 'username', 'email', 'first_name', 'last_name',
                   'telephone', 'localisation', 'nb_parcelles')
 
 
@@ -53,18 +53,29 @@ class CampagneConseillerSerializer(serializers.ModelSerializer):
 # --- Recommandations ---------------------------------------------------------
 
 class RecommandationSerializer(serializers.ModelSerializer):
-    """Recommandation créée et gérée par le conseiller."""
+    """Fil de messages conseiller ↔ agriculteur, vu par le conseiller."""
 
     agriculteur = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.filter(role=User.Role.AGRICULTEUR)
     )
     agriculteur_nom = serializers.CharField(source='agriculteur.username', read_only=True)
+    auteur_id = serializers.SerializerMethodField()
+    auteur_nom = serializers.SerializerMethodField()
 
     class Meta:
         model = Recommandation
         fields = ('id', 'agriculteur', 'agriculteur_nom', 'campagne', 'type',
-                  'titre', 'message', 'lue', 'date_creation')
-        read_only_fields = ('id', 'lue', 'date_creation')
+                  'titre', 'message', 'lue', 'date_creation',
+                  'auteur_id', 'auteur_nom')
+        read_only_fields = ('id', 'lue', 'date_creation', 'auteur_id', 'auteur_nom')
+
+    def get_auteur_id(self, recommandation):
+        # Les anciens messages (auteur null) ont été écrits par le conseiller.
+        return recommandation.auteur_id or recommandation.conseiller_id
+
+    def get_auteur_nom(self, recommandation):
+        auteur = recommandation.auteur or recommandation.conseiller
+        return auteur.get_full_name() or auteur.username
 
     def validate(self, attrs):
         agriculteur = attrs.get('agriculteur', getattr(self.instance, 'agriculteur', None))
@@ -77,16 +88,26 @@ class RecommandationSerializer(serializers.ModelSerializer):
 
 
 class RecommandationRecueSerializer(serializers.ModelSerializer):
-    """Recommandation vue par l'agriculteur qui la reçoit."""
+    """Fil de messages conseiller ↔ agriculteur, vu par l'agriculteur."""
 
     conseiller_nom = serializers.SerializerMethodField()
+    auteur_id = serializers.SerializerMethodField()
+    auteur_nom = serializers.SerializerMethodField()
 
     class Meta:
         model = Recommandation
-        fields = ('id', 'conseiller_nom', 'campagne', 'type',
-                  'titre', 'message', 'lue', 'date_creation')
+        fields = ('id', 'conseiller', 'conseiller_nom', 'campagne', 'type',
+                  'titre', 'message', 'lue', 'date_creation',
+                  'auteur_id', 'auteur_nom')
         read_only_fields = fields
 
     def get_conseiller_nom(self, recommandation):
         conseiller = recommandation.conseiller
         return conseiller.get_full_name() or conseiller.username
+
+    def get_auteur_id(self, recommandation):
+        return recommandation.auteur_id or recommandation.conseiller_id
+
+    def get_auteur_nom(self, recommandation):
+        auteur = recommandation.auteur or recommandation.conseiller
+        return auteur.get_full_name() or auteur.username

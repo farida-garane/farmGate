@@ -6,6 +6,8 @@ import os
 from pathlib import Path
 from datetime import timedelta
 
+import dj_database_url
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -20,7 +22,12 @@ SECRET_KEY = os.environ.get(
 # DEBUG=True seulement en développement
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+# Domaines autorisés, séparés par des virgules (ex: "mon-app.onrender.com")
+ALLOWED_HOSTS = [
+    h.strip()
+    for h in os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+    if h.strip()
+]
 
 
 # --- Applications -----------------------------------------------------------
@@ -60,15 +67,28 @@ MIDDLEWARE = [
 ]
 
 # Frontend Next.js (port 3000) et React (port 5173) autorisés à appeler l'API
+# Domaines supplémentaires autorisés (ex: frontend déployé), séparés par des virgules
+_extra_origins = [
+    o.strip()
+    for o in os.environ.get("EXTRA_CORS_ORIGINS", "").split(",")
+    if o.strip()
+]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-]
+] + _extra_origins
 # Le frontend envoie le cookie de session avec ses requêtes
 CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
+
+# Cookies sécurisés et HTTPS imposé en production (DEBUG=False)
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
 
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
@@ -102,15 +122,18 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 # --- Base de données (PostgreSQL) -------------------------------------------
 
+# DATABASE_URL (ex: Neon) si définie, sinon les variables DB_* (local / docker-compose)
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DB_NAME", "agri_db"),
-        "USER": os.environ.get("DB_USER", "postgres"),
-        "PASSWORD": os.environ.get("DB_PASSWORD", "postgres"),
-        "HOST": os.environ.get("DB_HOST", "localhost"),
-        "PORT": os.environ.get("DB_PORT", "5432"),
-    }
+    "default": dj_database_url.config(
+        default=(
+            f"postgres://{os.environ.get('DB_USER', 'postgres')}"
+            f":{os.environ.get('DB_PASSWORD', 'postgres')}"
+            f"@{os.environ.get('DB_HOST', 'localhost')}"
+            f":{os.environ.get('DB_PORT', '5432')}"
+            f"/{os.environ.get('DB_NAME', 'agri_db')}"
+        ),
+        conn_max_age=600,
+    )
 }
 
 

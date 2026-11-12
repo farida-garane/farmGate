@@ -11,4 +11,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 EXPOSE 8000
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# En prod (Render) : migrations puis Gunicorn sur le port fourni par la plateforme.
+# En local, docker-compose surcharge cette commande (runserver) — aucun impact.
+CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2"]

@@ -4,6 +4,7 @@ Django settings for config project.
 
 import os
 from pathlib import Path
+from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -115,11 +116,19 @@ DATABASES = {
 
 # --- Django REST Framework --------------------------------------------------
 
+
 REST_FRAMEWORK = {
     # Connexion par session Django (cookie) avec gestion des requêtes API cross-origin
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "utilisateurs.authentication.CsrfExemptSessionAuthentication",
     ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=24),
 }
 
 

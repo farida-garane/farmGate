@@ -33,7 +33,7 @@ class IsConseiller(permissions.BasePermission):
 # --- Suivi et analyse des agriculteurs (lecture seule) -----------------------
 
 class AgriculteurViewSet(viewsets.ReadOnlyModelViewSet):
-    """/api/conseiller/agriculteurs/ (filtres : ?localisation=, ?search=)"""
+    """/api/conseiller/agriculteurs/ (filtres : ?localite=, ?search=)"""
 
     serializer_class = AgriculteurSerializer
     permission_classes = (IsConseiller,)
@@ -43,8 +43,8 @@ class AgriculteurViewSet(viewsets.ReadOnlyModelViewSet):
             nb_parcelles=Count('parcelles')
         )
         params = self.request.query_params
-        if params.get('localisation'):
-            queryset = queryset.filter(localisation__icontains=params['localisation'])
+        if params.get('localite'):
+            queryset = queryset.filter(localite__icontains=params['localite'])
         if params.get('search'):
             search = params['search']
             queryset = queryset.filter(

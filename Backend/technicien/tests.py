@@ -16,7 +16,7 @@ class ConseillerTests(APITestCase):
 
     def setUp(self):
         self.conseiller = User.objects.create_user('conseiller', password='x', role=User.Role.CONSEILLER)
-        self.agri = User.objects.create_user('awa', password='x', localisation='Koudougou')
+        self.agri = User.objects.create_user('awa', password='x', localite='Koudougou')
         self.autre = User.objects.create_user('ali', password='x')
         parcelle = Parcelle.objects.create(agriculteur=self.agri, nom='Champ nord', superficie=2)
         self.campagne = Campagne.objects.create(
@@ -28,7 +28,7 @@ class ConseillerTests(APITestCase):
 
     def test_liste_des_agriculteurs(self):
         response = self.client.get(reverse('technicien:agriculteur-list'),
-                                   {'localisation': 'koudougou'})
+                                   {'localite': 'koudougou'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual([a['username'] for a in response.data], ['awa'])
         self.assertEqual(response.data[0]['nb_parcelles'], 1)

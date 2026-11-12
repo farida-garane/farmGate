@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 import { api, ApiError } from '@/lib/api';
+import NotificationBell from '@/components/NotificationBell';
 import type { Recommandation } from '@/lib/types';
 
 /* ── Icônes SVG ───────────────────────────────────────────────── */
@@ -21,11 +22,6 @@ const IconMap = () => (
 const IconLayers = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
-  </svg>
-);
-const IconBell = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
   </svg>
 );
 const IconUser = () => (
@@ -133,7 +129,8 @@ export default function AgriculteurLayout({ children }: { children: React.ReactN
           setAuthChecked(true);
           // Charger les recommandations pour le badge
           api.agriculteur.getRecommandations()
-            .then((r: import('@/lib/types').Recommandation[]) => setHasUnread(r.some((x) => !x.lue)))
+            .then((r: import('@/lib/types').Recommandation[]) =>
+              setHasUnread(r.some((x) => !x.lue && (x.auteur_id ?? x.conseiller) !== u.id)))
             .catch(() => {});
         })
         .catch((err: unknown) => {
@@ -154,10 +151,7 @@ export default function AgriculteurLayout({ children }: { children: React.ReactN
           <img src="/logo-farmgate.svg" alt="FarmGate" height={34} />
         </div>
         <div className="ag-topbar-actions">
-          <Link href="/agriculteur/recommandations" className="ag-topbar-icon" aria-label="Recommandations">
-            <IconBell />
-            {hasUnread && <span className="ag-badge-dot" />}
-          </Link>
+          <NotificationBell />
           <Link href="/agriculteur/profil" className="ag-topbar-profile">
             <span className="ag-topbar-profile-label">
               {userName ?? 'Connexion'}

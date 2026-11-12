@@ -31,16 +31,6 @@ export default function AgriculteursPage() {
 
   useEffect(() => { loadAgriculteurs(); }, [loadAgriculteurs]);
 
-  async function handleDelete(id: AgriculteurSuivi['id']) {
-    if (!window.confirm('Voulez-vous vraiment supprimer cet agriculteur ?')) return;
-    try {
-      await api.conseiller.deleteAgriculteur(id); // ← à remplacer par ta vraie fonction
-      setAgriculteurs((prev) => prev.filter((a) => a.id !== id));
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Suppression impossible.');
-    }
-  }
-
   return (
     <div className="page-container">
       <div className="section-header">
@@ -82,9 +72,9 @@ export default function AgriculteursPage() {
               <tr>
                 <th>Nom d'utilisateur</th>
                 <th>Nom complet</th>
+                <th>Email</th>
                 <th>Localisation</th>
                 <th>Téléphone</th>
-                <th style={{ textAlign: 'center' }}>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -92,16 +82,9 @@ export default function AgriculteursPage() {
                 <tr key={agri.id}>
                   <td style={{ fontWeight: 600 }}>{agri.username}</td>
                   <td>{agri.first_name} {agri.last_name}</td>
+                  <td>{agri.email || '—'}</td>
                   <td>{agri.localisation || 'Localisation non renseignée'}</td>
                   <td>{agri.telephone || '—'}</td>
-                  <td style={{ textAlign: 'center' }}>
-                    <button
-                      className="btn-delete"
-                      onClick={() => handleDelete(agri.id)}
-                    >
-                      Supprimer
-                    </button>
-                  </td>
                 </tr>
               ))}
             </tbody>

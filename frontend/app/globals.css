@@ -1,4 +1,14 @@
 @import "tailwindcss";
+@import "./styles/auth.css";
+@import "./styles/forms.css";
+@import "./styles/buttons.css";
+@import "./styles/tables.css";
+@import "./styles/modals.css";
+@import "./styles/cards.css";
+@import "./styles/layout.css";
+@import "./styles/components.css";
+@import "./styles/states.css";
+@import "./styles/landing.css";
 
 /* ==========================================================
    GLOBAL.CSS - Fichier principal avec imports et styles globaux
@@ -6,7 +16,7 @@
    Ce fichier contient:
    1. Les variables CSS globales (couleurs, palette)
    2. Le reset CSS global
-   3. Les imports des fichiers CSS thématiques
+   3. Les imports des fichiers CSS thématiques au sommet
 
    Les styles sont divisés dans le dossier styles/:
    - auth.css: Pages de connexion/inscription
@@ -18,6 +28,7 @@
    - layout.css: Page layout, containers
    - components.css: Composants spécifiques (stat-banner, filter-tabs, etc.)
    - states.css: États (erreur, succès, chargement, vide)
+   - landing.css: Page d'accueil publique
 
    Pour modifier le design, ouvrez le fichier correspondant dans styles/
    ========================================================== */
@@ -54,17 +65,3 @@ body {
   min-height: 100vh;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
-
-/* ==========================================================
-   IMPORTS DES FICHIERS CSS THÉMATIQUES
-   ========================================================== */
-
-@import "./styles/auth.css";
-@import "./styles/forms.css";
-@import "./styles/buttons.css";
-@import "./styles/tables.css";
-@import "./styles/modals.css";
-@import "./styles/cards.css";
-@import "./styles/layout.css";
-@import "./styles/components.css";
-@import "./styles/states.css";

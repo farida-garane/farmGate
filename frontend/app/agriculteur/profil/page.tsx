@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, ApiError } from '@/lib/api';
+import { roleLabel } from '@/lib/utils';
 import type { User } from '@/lib/types';
 
 export default function ProfilPage() {
@@ -61,16 +62,24 @@ export default function ProfilPage() {
               <span className="profil-value">{user.username}</span>
             </div>
             <div className="profil-row">
+              <span className="profil-label">Email</span>
+              <span className="profil-value">{user.email || '-'}</span>
+            </div>
+            <div className="profil-row">
               <span className="profil-label">Téléphone</span>
               <span className="profil-value">{user.telephone || '-'}</span>
             </div>
             <div className="profil-row">
               <span className="profil-label">Localité</span>
-              <span className="profil-value">{user.Localité || '-'}</span>
+              <span className="profil-value">{user.localisation || '-'}</span>
+            </div>
+            <div className="profil-row">
+              <span className="profil-label">Rôle</span>
+              <span className="profil-value">{roleLabel(user)}</span>
             </div>
             <div className="profil-row">
               <span className="profil-label">Mot de passe</span>
-              <span className="profil-value"></span>
+              <span className="profil-value">••••••••</span>
             </div>
           </div>
         ) : (

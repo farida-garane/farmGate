@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
+import { roleLabel } from '@/lib/utils';
 
 export default function AdminProfilPage() {
   const [user, setUser] = useState<any>(null);
@@ -62,7 +63,19 @@ export default function AdminProfilPage() {
         </div>
         <div className="profil-row">
           <span className="profil-label">Rôle</span>
-          <span className="profil-value">Administrateur</span>
+          <span className="profil-value">{roleLabel(user)}</span>
+        </div>
+        <div className="profil-row">
+          <span className="profil-label">Téléphone</span>
+          <span className="profil-value">{user.telephone || '—'}</span>
+        </div>
+        <div className="profil-row">
+          <span className="profil-label">Localisation</span>
+          <span className="profil-value">{user.localisation || '—'}</span>
+        </div>
+        <div className="profil-row">
+          <span className="profil-label">Mot de passe</span>
+          <span className="profil-value">••••••••</span>
         </div>
       </div>
     </div>

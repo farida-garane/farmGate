@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
+import NotificationBell from '@/components/NotificationBell';
 
 /* ── Icônes SVG ───────────────────────────────────────────────── */
 const IconHome = () => (
@@ -30,11 +31,6 @@ const IconUser = () => (
 const IconChevron = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="6 9 12 15 18 9"/>
-  </svg>
-);
-const IconBell = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
   </svg>
 );
 const IconLogout = () => (
@@ -132,9 +128,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <img src="/logo-farmgate.svg" alt="FarmGate" height={34} />
         </div>
         <div className="admin-topbar-actions">
-          <div className="admin-topbar-icon" aria-label="Notifications">
-            <IconBell />
-          </div>
+          <NotificationBell />
           <Link href="/admin/profil" className="admin-topbar-profile">
             <span className="admin-topbar-profile-label">
               {userName ?? 'Connexion'}

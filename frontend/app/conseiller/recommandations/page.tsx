@@ -2,13 +2,14 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { api } from '@/lib/api';
-import type { Recommandation, AgriculteurSuivi } from '@/lib/types';
+import type { Recommandation, AgriculteurSuivi, User } from '@/lib/types';
 import { formatDate } from '@/lib/utils';
 
 const TYPE_LABELS: Record<string, string> = {
   ACCOMPAGNEMENT: 'Accompagnement',
   ANALYSE: 'Analyse',
   PREVENTION: 'Prévention',
+  REPONSE: 'Réponse',
 };
 
 // ── Add Recommandation modal ──────────────────────────────────
@@ -116,6 +117,7 @@ function AddRecommandationModal({ onClose, onCreated, agriculteurs }: { onClose:
 }
 
 export default function RecommandationsPage() {
+  const [user, setUser] = useState<User | null>(null);
   const [recommandations, setRecommandations] = useState<Recommandation[]>([]);
   const [agriculteurs, setAgriculteurs] = useState<AgriculteurSuivi[]>([]);
   const [loading, setLoading] = useState(true);
@@ -125,12 +127,14 @@ export default function RecommandationsPage() {
   const loadData = useCallback(async () => {
     setLoading(true); setError('');
     try {
-      const [recs, agris] = await Promise.all([
+      const [recs, agris, me] = await Promise.all([
         api.conseiller.getRecommandations(),
         api.conseiller.getAgriculteurs(),
+        api.auth.me(),
       ]);
       setRecommandations(recs.sort((a, b) => b.date_creation.localeCompare(a.date_creation)));
       setAgriculteurs(agris);
+      setUser(me);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Impossible de charger les recommandations.');
     } finally {
@@ -139,6 +143,20 @@ export default function RecommandationsPage() {
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  const isMine = (r: Recommandation) =>
+    !!user && (r.auteur_id ?? r.agriculteur) === user.id;
+
+  async function handleLire(id: number) {
+    try {
+      const updated = await api.conseiller.lireRecommandation(id);
+      setRecommandations((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, lue: updated.lue } : r))
+      );
+    } catch {
+      // silently fail
+    }
+  }
 
   return (
     <div className="page-container">
@@ -169,6 +187,7 @@ export default function RecommandationsPage() {
                 <th>Titre</th>
                 <th>Type</th>
                 <th>Agriculteur</th>
+                <th>De</th>
                 <th>Date</th>
                 <th>Statut</th>
                 <th>Message</th>
@@ -177,16 +196,26 @@ export default function RecommandationsPage() {
             <tbody>
               {recommandations.map((r) => {
                 const agri = agriculteurs.find((a) => a.id === r.agriculteur);
+                const mine = isMine(r);
                 return (
                   <tr key={r.id}>
-                    <td style={{ fontWeight: 600 }}>{r.titre}</td>
+                    <td style={{ fontWeight: 600 }}>{r.titre || 'Réponse'}</td>
                     <td>{TYPE_LABELS[r.type] || r.type}</td>
                     <td>{agri ? agri.username : '—'}</td>
+                    <td>{mine ? 'Vous' : (r.auteur_nom || agri?.username || '—')}</td>
                     <td>{formatDate(r.date_creation)}</td>
                     <td>
-                      <span className={`badge ${r.lue ? 'badge-gray' : 'badge-gold'}`}>
-                        {r.lue ? 'Lue' : 'Non lue'}
-                      </span>
+                      {mine ? (
+                        <span className={`badge ${r.lue ? 'badge-gray' : 'badge-gold'}`}>
+                          {r.lue ? 'Lue par l\'agriculteur' : 'En attente de lecture'}
+                        </span>
+                      ) : !r.lue ? (
+                        <button className="btn btn-outline" style={{ padding: '4px 10px', fontSize: 12 }} onClick={() => handleLire(r.id)}>
+                          Marquer comme lue
+                        </button>
+                      ) : (
+                        <span className="badge badge-gray">Lue</span>
+                      )}
                     </td>
                     <td style={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {r.message}

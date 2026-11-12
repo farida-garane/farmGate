@@ -28,6 +28,17 @@ export function formatDate(dateString: string): string {
 }
 
 /**
+ * Libellé lisible du rôle utilisateur (is_staff → Administrateur)
+ */
+export function roleLabel(user: { role?: string; is_staff?: boolean } | null | undefined): string {
+  if (!user) return '—';
+  if (user.is_staff) return 'Administrateur';
+  if (user.role === 'CONSEILLER') return 'Conseiller agricole';
+  if (user.role === 'AGRICULTEUR') return 'Agriculteur';
+  return user.role || '—';
+}
+
+/**
  * Récupère un cookie par son nom (utile pour le jeton csrftoken de Django côté navigateur)
  */
 export function getCookie(name: string): string | null {

@@ -6,6 +6,7 @@ import type {
   Campagne,
   Depense,
   Intervention,
+  NotificationItem,
   Parcelle,
   Recolte,
   Recommandation,
@@ -87,7 +88,7 @@ export const api = {
       first_name: string;
       last_name: string;
       telephone?: string;
-      localite?: string;
+      localisation?: string;
       role: 'AGRICULTEUR' | 'CONSEILLER';
       password: string;
       password2: string;
@@ -182,6 +183,11 @@ export const api = {
       request<Recommandation>(`/conseiller/mes-recommandations/${id}/lire/`, {
         method: 'POST',
       }),
+    repondreRecommandation: (id: number, message: string) =>
+      request<Recommandation>(`/conseiller/mes-recommandations/${id}/repondre/`, {
+        method: 'POST',
+        body: JSON.stringify({ message }),
+      }),
   },
 
   // Espace Admin
@@ -192,7 +198,7 @@ export const api = {
       first_name: string;
       telephone: string;
       email: string;
-      localite: string;
+      localisation: string;
       password: string;
       role: 'AGRICULTEUR' | 'CONSEILLER';
     }) =>
@@ -200,7 +206,7 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(data),
       }),
-    changeStatut: (id: number, statut: 'ACTIF' | 'INACTIF' | 'SUPPRIME') =>
+    changeStatut: (id: number, statut: 'ACTIF' | 'INACTIF') =>
       request<any>(`/admin/users/${id}/statut/`, {
         method: 'POST',
         body: JSON.stringify({ statut }),
@@ -217,11 +223,24 @@ export const api = {
       request<any>(`/admin/users/${id}/`),
   },
 
+  // Notifications (cloche de l'utilisateur connecté)
+  notifications: {
+    list: (nonLues?: boolean) =>
+      request<NotificationItem[]>(`/notifications/${nonLues ? '?non_lues=true' : ''}`),
+    compteur: () => request<{ non_lues: number }>('/notifications/compteur/'),
+    lire: (id: number) =>
+      request<NotificationItem>(`/notifications/${id}/lire/`, { method: 'POST' }),
+    lireTout: () =>
+      request<{ detail: string; non_lues: number }>('/notifications/lire-tout/', {
+        method: 'POST',
+      }),
+  },
+
   // Espace Conseiller
   conseiller: {
-    getAgriculteurs: (params?: { localite?: string; search?: string }) => {
+    getAgriculteurs: (params?: { localisation?: string; search?: string }) => {
       const sp = new URLSearchParams();
-      if (params?.localite) sp.set('localite', params.localite);
+      if (params?.localisation) sp.set('localisation', params.localisation);
       if (params?.search) sp.set('search', params.search);
       const qs = sp.toString() ? `?${sp.toString()}` : '';
       return request<AgriculteurSuivi[]>(`/conseiller/agriculteurs/${qs}`);
@@ -258,6 +277,10 @@ export const api = {
       request<Recommandation>('/conseiller/recommandations/', {
         method: 'POST',
         body: JSON.stringify(data),
+      }),
+    lireRecommandation: (id: number) =>
+      request<Recommandation>(`/conseiller/recommandations/${id}/lire/`, {
+        method: 'POST',
       }),
   },
 };

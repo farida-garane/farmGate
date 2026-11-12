@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 import { api, ApiError } from '@/lib/api';
+import NotificationBell from '@/components/NotificationBell';
 import type { Recommandation } from '@/lib/types';
 
 /* ── Icônes SVG ───────────────────────────────────── */
@@ -31,11 +32,6 @@ const IconUser = () => (
 const IconChevron = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="6 9 12 15 18 9"/>
-  </svg>
-);
-const IconBell = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
   </svg>
 );
 const IconLogout = () => (
@@ -73,7 +69,8 @@ export default function ConseillerLayout({ children }: { children: React.ReactNo
         setAuthChecked(true);
         // Charger les recommandations pour le badge
         api.conseiller.getRecommandations()
-          .then((r: Recommandation[]) => setHasUnread(r.some((x) => !x.lue)))
+          .then((r: Recommandation[]) =>
+            setHasUnread(r.some((x) => !x.lue && (x.auteur_id ?? x.agriculteur) !== u.id)))
           .catch(() => {});
       })
       .catch((err: unknown) => {
@@ -103,10 +100,7 @@ export default function ConseillerLayout({ children }: { children: React.ReactNo
 
         {/* Actions droite */}
         <div className="co-topbar-actions">
-          <div className="co-topbar-icon" aria-label="Notifications">
-            <IconBell />
-            {hasUnread && <span className="co-badge-dot" />}
-          </div>
+          <NotificationBell />
           <Link href="/conseiller/profil" className="co-topbar-profile">
             <span className="co-topbar-profile-label">
               {userName ?? 'Connexion'}

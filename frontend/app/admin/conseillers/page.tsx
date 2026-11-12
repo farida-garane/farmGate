@@ -10,10 +10,10 @@ type UserAdmin = {
   first_name: string;
   last_name: string;
   telephone?: string;
-  localite?: string;
+  localisation?: string;
   date_creation: string;
   is_active: boolean;
-  statut: 'ACTIF' | 'INACTIF' | 'SUPPRIME';
+  statut: 'ACTIF' | 'INACTIF';
 };
 
 export default function AdminConseillersPage() {
@@ -22,15 +22,16 @@ export default function AdminConseillersPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'ACTIF' | 'INACTIF' | 'SUPPRIME'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'ACTIF' | 'INACTIF'>('all');
   const [showModal, setShowModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState('');
   const [formData, setFormData] = useState({
     last_name: '',
     first_name: '',
     telephone: '',
     email: '',
-    localite: '',
+    localisation: '',
     password: '',
   });
 
@@ -48,6 +49,13 @@ export default function AdminConseillersPage() {
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  // Ouvre le modal de création via le lien « Ajouter » du dashboard (?ajouter=1)
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('ajouter') === '1') {
+      setShowModal(true);
+    }
+  }, []);
 
   // Masquer le message de succès après 3 secondes
   useEffect(() => {
@@ -76,16 +84,31 @@ export default function AdminConseillersPage() {
 
     const nomComplet = [user.first_name, user.last_name].filter(Boolean).join(' ') || user.email;
 
+    // Suppression définitive du compte (irrÉversible)
     if (newStatut === 'SUPPRIME') {
       const ok = window.confirm(
-        `⚠️ Êtes-vous sûr de vouloir marquer le compte de « ${nomComplet} » comme supprimé ?\n\nCet utilisateur ne pourra plus se connecter.`
+        `Supprimer définitivement le compte de « ${nomComplet} » ?\n\nCette action est irréversible : le compte et toutes ses données seront effacés.`
       );
-      if (!ok) return;
+      if (!ok) {
+        setUsers([...users]); // force le select à revenir à sa valeur réelle
+        return;
+      }
+      setError('');
+      setSuccess('');
+      try {
+        await api.admin.deleteUser(user.id);
+        setUsers(users.filter((u) => u.id !== user.id));
+        setSuccess(`Le compte de « ${nomComplet} » a été supprimé.`);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Erreur lors de la suppression.');
+        setUsers([...users]);
+      }
+      return;
     }
 
     if (newStatut === 'INACTIF') {
       const ok = window.confirm(
-        `Voulez-vous désactiver le compte de « ${nomComplet} » ?\n\nCet utilisateur ne pourra plus se connecter tant que le compte est inactif.`
+        `Voulez-vous désactiver le compte de « ${nomComplet} » ?\n\nCet utilisateur ne pourra plus se connecter tant que le compte est désactivé.`
       );
       if (!ok) return;
     }
@@ -96,24 +119,13 @@ export default function AdminConseillersPage() {
       const updated = await api.admin.changeStatut(user.id, newStatut);
       setUsers(users.map((u) => (u.id === user.id ? { ...u, ...updated } : u)));
 
-      const labels: Record<string, string> = {
-        ACTIF: 'activé',
-        INACTIF: 'désactivé',
-        SUPPRIME: 'marqué comme supprimé',
-      };
-      setSuccess(`✅ Le compte de « ${nomComplet} » a été ${labels[newStatut]}.`);
+      setSuccess(
+        newStatut === 'ACTIF'
+          ? `Le compte de « ${nomComplet} » a été activé.`
+          : `Le compte de « ${nomComplet} » a été désactivé.`
+      );
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la modification du statut.');
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce conseiller ?')) return;
-    try {
-      await api.admin.deleteUser(id);
-      setUsers(users.filter((u) => u.id !== id));
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Erreur lors de la suppression.');
     }
   };
 
@@ -123,8 +135,8 @@ export default function AdminConseillersPage() {
     try {
       await api.admin.createUser({ ...formData, role: 'CONSEILLER' });
       setShowModal(false);
-      setFormData({ last_name: '', first_name: '', telephone: '', email: '', localite: '', password: '' });
-      setSuccess(`✅ Le conseiller « ${formData.first_name} ${formData.last_name} » a été créé avec succès.`);
+      setFormData({ last_name: '', first_name: '', telephone: '', email: '', localisation: '', password: '' });
+      setSuccess(`Le conseiller « ${formData.first_name} ${formData.last_name} » a été créé avec succès.`);
       loadData();
     } catch (err: unknown) {
       setFormError(err instanceof Error ? err.message : 'Erreur lors de la création.');
@@ -147,7 +159,7 @@ export default function AdminConseillersPage() {
 
       {error && (
         <div className="error-state" style={{ marginBottom: '16px', padding: '12px 16px', background: '#FEF2F2', color: '#991B1B', borderRadius: '8px', fontSize: '14px' }}>
-          ❌ {error}
+          {error}
         </div>
       )}
 
@@ -174,8 +186,7 @@ export default function AdminConseillersPage() {
         >
           <option value="all">Tous</option>
           <option value="ACTIF">Actif</option>
-          <option value="INACTIF">Inactif</option>
-          <option value="SUPPRIME">Supprimé</option>
+          <option value="INACTIF">Désactivé</option>
         </select>
       </div>
 
@@ -190,6 +201,7 @@ export default function AdminConseillersPage() {
           <table className="data-table">
             <thead>
               <tr>
+                <th>Nom d'utilisateur</th>
                 <th>Nom</th>
                 <th>Prénom</th>
                 <th>Téléphone</th>
@@ -197,43 +209,34 @@ export default function AdminConseillersPage() {
                 <th>Localité</th>
                 <th>Date d&apos;inscription</th>
                 <th>Statut</th>
-                <th style={{ textAlign: 'center' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((u) => (
                 <tr key={u.id}>
+                  <td style={{ fontWeight: 600 }}>{u.username}</td>
                   <td style={{ fontWeight: 600 }}>{u.last_name || '—'}</td>
                   <td>{u.first_name || '—'}</td>
                   <td>{u.telephone || '—'}</td>
                   <td>{u.email}</td>
-                  <td>{u.localite || '—'}</td>
+                  <td>{u.localisation || '—'}</td>
                   <td>{formatDate(u.date_creation)}</td>
                   <td>
-                    <select
-                      className="form-input"
-                      value={u.statut || 'ACTIF'}
-                      onChange={(e) => handleStatutChange(u, e.target.value as any)}
-                      style={{
-                        minWidth: '120px',
-                        padding: '6px 10px',
-                        fontSize: '13px',
-                        color: u.statut === 'ACTIF' ? '#166534' : u.statut === 'SUPPRIME' ? '#991B1B' : '#92400E',
-                        fontWeight: 600,
-                      }}
-                    >
-                      <option value="ACTIF">Actif</option>
-                      <option value="INACTIF">Inactif</option>
-                      <option value="SUPPRIME">Supprimé</option>
-                    </select>
-                  </td>
-                  <td style={{ textAlign: 'center' }}>
-                    <button
-                      className="btn-delete"
-                      onClick={() => handleDelete(u.id)}
-                    >
-                      Supprimer
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <select
+                        className="form-input"
+                        value={u.statut || 'ACTIF'}
+                        onChange={(e) => handleStatutChange(u, e.target.value as 'ACTIF' | 'INACTIF' | 'SUPPRIME')}
+                        style={{ minWidth: '120px', padding: '6px 10px', fontSize: '13px' }}
+                      >
+                        <option value="ACTIF">Actif</option>
+                        <option value="INACTIF">Désactivé</option>
+                        <option value="SUPPRIME">Supprimé</option>
+                      </select>
+                      <span className={`badge ${u.statut === 'ACTIF' ? 'badge-green' : 'badge-gray'}`}>
+                        {u.statut === 'ACTIF' ? 'Compte actif' : 'Compte désactivé'}
+                      </span>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -249,7 +252,7 @@ export default function AdminConseillersPage() {
             <h2 className="modal-title">Ajouter un conseiller</h2>
             {formError && (
               <div className="error-state" style={{ marginBottom: '12px', padding: '10px 14px', background: '#FEF2F2', color: '#991B1B', borderRadius: '8px', fontSize: '14px' }}>
-                ❌ {formError}
+                {formError}
               </div>
             )}
             <form onSubmit={handleSubmit}>
@@ -275,11 +278,38 @@ export default function AdminConseillersPage() {
               </div>
               <div className="form-group">
                 <label className="form-label">Localité</label>
-                <input className="form-input" required value={formData.localite} onChange={(e) => setFormData({ ...formData, localite: e.target.value })} />
+                <input className="form-input" required value={formData.localisation} onChange={(e) => setFormData({ ...formData, localisation: e.target.value })} />
               </div>
               <div className="form-group">
                 <label className="form-label">Mot de passe initial</label>
-                <input className="form-input" type="password" required value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
+                <div className="password-input-wrapper">
+                  <input
+                    className="form-input"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                        <line x1="1" y1="1" x2="23" y2="23" />
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
               <div className="modal-actions">
                 <button type="button" className="btn btn-ghost" onClick={() => setShowModal(false)}>Annuler</button>

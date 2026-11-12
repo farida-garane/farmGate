@@ -66,4 +66,38 @@
   color: var(--text);
 }
 
+/* ── Champ mot de passe avec bouton afficher/masquer ── */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-input-wrapper .form-input {
+  padding-right: 44px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 6px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.password-toggle-btn:hover {
+  color: var(--green);
+  background-color: rgba(27, 94, 32, 0.06);
+}
+
 @media (max-width: 580px) { .form-row { grid-template-columns: 1fr; } }

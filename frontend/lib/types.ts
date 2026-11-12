@@ -12,14 +12,14 @@ export interface User {
   role: Role;
   is_staff: boolean;
   telephone: string | null;
-  localite: string | null;
+  localisation: string | null;
 }
 
 export interface Parcelle {
   id: number;
   nom: string;
   superficie: string | number;
-  localite: string;
+  localisation: string;
   type_sol: string;
   date_creation: string;
   agriculteur?: number;
@@ -78,12 +78,17 @@ export interface Recolte {
   unite: UniteRecolte;
 }
 
-export type TypeRecommandation = 'ACCOMPAGNEMENT' | 'ANALYSE' | 'PREVENTION';
+export type TypeRecommandation =
+  | 'ACCOMPAGNEMENT'
+  | 'ANALYSE'
+  | 'PREVENTION'
+  | 'REPONSE';
 
 export interface Recommandation {
   id: number;
-  agriculteur: number;
+  agriculteur?: number;
   agriculteur_nom?: string;
+  conseiller?: number;
   conseiller_nom?: string;
   campagne: number | null;
   type: TypeRecommandation;
@@ -91,8 +96,22 @@ export interface Recommandation {
   message: string;
   lue: boolean;
   date_creation: string;
+  auteur_id?: number;
+  auteur_nom?: string;
 }
 
 export interface AgriculteurSuivi extends User {
   nb_parcelles: number;
+}
+
+export type TypeNotification = 'RECOMMANDATION' | 'INSCRIPTION' | 'COMPTE';
+
+export interface NotificationItem {
+  id: number;
+  type: TypeNotification;
+  titre: string;
+  message: string;
+  lue: boolean;
+  lien: string;
+  date_creation: string;
 }

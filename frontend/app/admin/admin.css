@@ -250,3 +250,60 @@
   background: #2E7D32;
   border-color: #2E7D32;
 }
+
+/* ==========================================================
+   SECTIONS DU DASHBOARD (accès rapides + derniers users)
+   ========================================================== */
+
+.admin-dash-section {
+  margin-top: 32px;
+}
+
+.admin-section-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+/* ── Accès rapides ── */
+.admin-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.admin-quick-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  text-decoration: none;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+.admin-quick-card:hover {
+  border-color: var(--green);
+  box-shadow: 0 4px 16px rgba(27, 94, 32, 0.1);
+  transform: translateY(-1px);
+}
+
+.admin-quick-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(27, 94, 32, 0.09);
+  color: var(--green);
+}
+
+.admin-quick-label {
+  line-height: 1.35;
+}

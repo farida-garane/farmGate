@@ -103,6 +103,7 @@ export default function RecommandationsPage() {
                     <div className="card-meta" style={{ marginTop: 4 }}>
                       {r.type !== 'REPONSE' && `${TYPE_LABELS[r.type] || r.type} · `}
                       {mine ? 'Vous' : (r.auteur_nom || r.conseiller_nom || 'Conseiller')}
+                      {user?.is_staff && r.agriculteur_nom ? ` · ${r.agriculteur_nom}` : ''}
                       {'  '}
                       {formatDate(r.date_creation)}
                     </div>
@@ -125,7 +126,7 @@ export default function RecommandationsPage() {
                           className="form-textarea"
                           rows={3}
                           value={replyText}
-                          onChange={(e) => setReplyText(e.target.value)}
+                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setReplyText(e.target.value)}
                           placeholder="Votre réponse..."
                         />
                         <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>

@@ -8,7 +8,9 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     """Profil renvoyé après l'inscription, la connexion ou l'appel à /me/."""
 
-    localite = serializers.CharField(source='localisation', read_only=True, allow_null=True)
+    # Alias de compatibilité : le frontend utilise « localisation »,
+    # le modèle stocke « localite ».
+    localisation = serializers.CharField(source='localite', read_only=True, allow_null=True)
 
     class Meta:
         model = User
@@ -21,8 +23,8 @@ class UserSerializer(serializers.ModelSerializer):
             'role',
             'is_staff',
             'telephone',
-            'localisation',
             'localite',
+            'localisation',
         )
 
 
@@ -38,8 +40,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         default=User.Role.AGRICULTEUR,
         required=False,
     )
-    localite = serializers.CharField(
-        source='localisation',
+    localisation = serializers.CharField(
+        source='localite',
         required=False,
         allow_blank=True,
         allow_null=True,
@@ -54,8 +56,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             'last_name',
             'role',
             'telephone',
-            'localisation',
             'localite',
+            'localisation',
             'password',
             'password2',
         )
@@ -115,7 +117,7 @@ class LoginSerializer(serializers.Serializer):
 class AdminUserSerializer(serializers.ModelSerializer):
     """Sérialiseur pour la gestion des utilisateurs dans l'espace admin."""
 
-    localite = serializers.CharField(source='localisation', required=False, allow_blank=True, allow_null=True)
+    localisation = serializers.CharField(source='localite', required=False, allow_blank=True, allow_null=True)
     statut = serializers.SerializerMethodField()
 
     class Meta:
@@ -130,8 +132,8 @@ class AdminUserSerializer(serializers.ModelSerializer):
             'is_staff',
             'is_active',
             'telephone',
-            'localisation',
             'localite',
+            'localisation',
             'date_creation',
             'statut',
         )
@@ -144,7 +146,7 @@ class AdminUserCreateSerializer(serializers.ModelSerializer):
     """Création d'un utilisateur par un administrateur."""
 
     password = serializers.CharField(write_only=True)
-    localite = serializers.CharField(source='localisation', required=False, allow_blank=True, allow_null=True)
+    localisation = serializers.CharField(source='localite', required=False, allow_blank=True, allow_null=True)
 
     class Meta:
         model = User
@@ -154,8 +156,8 @@ class AdminUserCreateSerializer(serializers.ModelSerializer):
             'last_name',
             'role',
             'telephone',
-            'localisation',
             'localite',
+            'localisation',
             'password',
         )
 

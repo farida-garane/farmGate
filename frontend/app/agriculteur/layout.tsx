@@ -142,6 +142,12 @@ export default function AgriculteurLayout({ children }: { children: React.ReactN
     });
   }, []);
 
+  // N'afficher le contenu (et laisser les pages appeler l'API) qu'après
+  // la vérification du rôle — sinon un non-agriculteur verrait les erreurs 403.
+  if (!authChecked) {
+    return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>Chargement...</div>;
+  }
+
   return (
     <div className="ag-shell">
 

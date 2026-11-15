@@ -18,11 +18,13 @@ User = get_user_model()
 
 class AgriculteurSerializer(serializers.ModelSerializer):
     nb_parcelles = serializers.IntegerField(read_only=True)
+    # Le modèle User stocke « localite » ; « localisation » est l'alias API.
+    localisation = serializers.CharField(source='localite', read_only=True)
 
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'first_name', 'last_name',
-                  'telephone', 'localisation', 'nb_parcelles')
+                  'telephone', 'localite', 'localisation', 'nb_parcelles')
 
 
 class ParcelleConseillerSerializer(ParcelleSerializer):
@@ -91,12 +93,14 @@ class RecommandationRecueSerializer(serializers.ModelSerializer):
     """Fil de messages conseiller ↔ agriculteur, vu par l'agriculteur."""
 
     conseiller_nom = serializers.SerializerMethodField()
+    agriculteur_nom = serializers.SerializerMethodField()
     auteur_id = serializers.SerializerMethodField()
     auteur_nom = serializers.SerializerMethodField()
 
     class Meta:
         model = Recommandation
-        fields = ('id', 'conseiller', 'conseiller_nom', 'campagne', 'type',
+        fields = ('id', 'conseiller', 'conseiller_nom', 'agriculteur',
+                  'agriculteur_nom', 'campagne', 'type',
                   'titre', 'message', 'lue', 'date_creation',
                   'auteur_id', 'auteur_nom')
         read_only_fields = fields
@@ -104,6 +108,10 @@ class RecommandationRecueSerializer(serializers.ModelSerializer):
     def get_conseiller_nom(self, recommandation):
         conseiller = recommandation.conseiller
         return conseiller.get_full_name() or conseiller.username
+
+    def get_agriculteur_nom(self, recommandation):
+        agriculteur = recommandation.agriculteur
+        return agriculteur.get_full_name() or agriculteur.username
 
     def get_auteur_id(self, recommandation):
         return recommandation.auteur_id or recommandation.conseiller_id

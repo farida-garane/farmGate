@@ -33,7 +33,7 @@ class IsConseiller(permissions.BasePermission):
 # --- Suivi et analyse des agriculteurs (lecture seule) -----------------------
 
 class AgriculteurViewSet(viewsets.ReadOnlyModelViewSet):
-    """/api/conseiller/agriculteurs/ (filtres : ?localite=, ?search=)"""
+    """/api/conseiller/agriculteurs/ (filtres : ?localite= ou ?localisation=, ?search=)"""
 
     serializer_class = AgriculteurSerializer
     permission_classes = (IsConseiller,)
@@ -43,8 +43,9 @@ class AgriculteurViewSet(viewsets.ReadOnlyModelViewSet):
             nb_parcelles=Count('parcelles')
         )
         params = self.request.query_params
-        if params.get('localite'):
-            queryset = queryset.filter(localite__icontains=params['localite'])
+        localisation = params.get('localite') or params.get('localisation')
+        if localisation:
+            queryset = queryset.filter(localite__icontains=localisation)
         if params.get('search'):
             search = params['search']
             queryset = queryset.filter(
@@ -104,9 +105,10 @@ class RecommandationViewSet(viewsets.ModelViewSet):
     permission_classes = (IsConseiller,)
 
     def get_queryset(self):
-        queryset = Recommandation.objects.filter(
-            conseiller=self.request.user
-        ).select_related('agriculteur', 'auteur')
+        # L'administrateur voit les fils de messages de tous les conseillers.
+        base = Recommandation.objects.all() if self.request.user.is_staff \
+            else Recommandation.objects.filter(conseiller=self.request.user)
+        queryset = base.select_related('agriculteur', 'auteur')
         agriculteur = self.request.query_params.get('agriculteur')
         if agriculteur:
             queryset = queryset.filter(agriculteur_id=agriculteur)
@@ -144,6 +146,11 @@ class MesRecommandationsViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAgriculteur,)
 
     def get_queryset(self):
+        # L'administrateur voit le fil de messages de tous les agriculteurs.
+        if self.request.user.is_staff:
+            return Recommandation.objects.all().select_related(
+                'conseiller', 'auteur', 'agriculteur'
+            )
         return Recommandation.objects.filter(
             agriculteur=self.request.user
         ).select_related('conseiller', 'auteur')

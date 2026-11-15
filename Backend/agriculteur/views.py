@@ -27,6 +27,9 @@ class ParcelleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAgriculteur,)
 
     def get_queryset(self):
+        # L'administrateur voit les données de tous les agriculteurs.
+        if self.request.user.is_staff:
+            return Parcelle.objects.all()
         return Parcelle.objects.filter(agriculteur=self.request.user)
 
     def perform_create(self, serializer):
@@ -40,9 +43,9 @@ class CampagneViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAgriculteur,)
 
     def get_queryset(self):
-        queryset = Campagne.objects.filter(
-            parcelle__agriculteur=self.request.user
-        ).select_related('parcelle')
+        base = Campagne.objects.all() if self.request.user.is_staff \
+            else Campagne.objects.filter(parcelle__agriculteur=self.request.user)
+        queryset = base.select_related('parcelle')
         parcelle = self.request.query_params.get('parcelle')
         if parcelle:
             queryset = queryset.filter(parcelle_id=parcelle)
@@ -56,9 +59,11 @@ class CampagneLieeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAgriculteur,)
 
     def get_queryset(self):
-        queryset = self.model.objects.filter(
-            campagne__parcelle__agriculteur=self.request.user
-        )
+        base = self.model.objects.all() if self.request.user.is_staff \
+            else self.model.objects.filter(
+                campagne__parcelle__agriculteur=self.request.user
+            )
+        queryset = base
         campagne = self.request.query_params.get('campagne')
         if campagne:
             queryset = queryset.filter(campagne_id=campagne)

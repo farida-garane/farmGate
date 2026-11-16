@@ -34,6 +34,9 @@ services:
     build: ./frontend
     stdin_open: true
     tty: true
+    environment:
+      # Le proxy /api de Next.js doit joindre le backend via le réseau Docker
+      BACKEND_URL: http://backend:8000
     volumes:
       - ./frontend:/app
       - /app/node_modules

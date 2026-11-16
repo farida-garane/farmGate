@@ -14,8 +14,10 @@ import type {
   AgriculteurSuivi,
 } from './types';
 
+// Par défaut, les appels passent par le proxy /api du frontend (next.config rewrites)
+// vers le backend. NEXT_PUBLIC_API_URL permet de pointer directement vers une API externe.
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+  process.env.NEXT_PUBLIC_API_URL || '/api';
 
 export class ApiError extends Error {
   status: number;
